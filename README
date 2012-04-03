@@ -3,3 +3,5 @@ BagIt Library for StudentWeb
 
 Introduction
 ------------
+This library enables the packaging of files and metadata from StudentWeb into Bags and the unpackaging of these Bags for
+use in Duo-DSpace.
