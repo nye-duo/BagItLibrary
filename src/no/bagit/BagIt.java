@@ -51,13 +51,6 @@ public class BagIt {
 
     }
 
-    /*
-        creates a BagIt from a primary and secondary directory
-     */
-
-    BagIt(InputStream primary, InputStream secondary) {
-
-    }
 
     /*
         adds a file to our BagIt
@@ -67,7 +60,13 @@ public class BagIt {
     }
 
     /*
+       get the licence for the item
+    */
+
+
+    /*
         returns the list of primary files in sequence
+        data/final/[final version files] ordered by tagfiles/final.sequence.txt
      */
     public InputStream getPrimary() {
 
@@ -84,6 +83,7 @@ public class BagIt {
 
     /*
        returns the list of secondary files in sequence
+       data/supporting/[supporting files] ordered by tagfiles/supporting.sequence.txt
     */
     public InputStream getSecondary() {
 
@@ -100,6 +100,23 @@ public class BagIt {
 
     /*
         verifies the bag against it's manifest
+     */
+
+    /*
+        Looks for access set for filename in
+        tagfiles/supporting.access.txt
+
+        will be open or closed
+    */
+    public String getSupportingAccess(String filename) {
+
+        return "open";
+    }
+
+
+    /*
+        returns the metadata file
+        data/metadata/metadata.xml
      */
 
 
