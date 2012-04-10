@@ -41,10 +41,29 @@ public class BagIt {
     BagFactory bagFactory = new BagFactory();
 
 
-    // our constructors
     /*
-        creates a BagIt from an existing directory
-     */
+        creates a BagIt from an existing directory organised in the correct
+        format
+
+        <base directory>/
+        |   bagit.txt
+        |   manifest-md5.txt
+        |   tagmanifest-md5.txt
+        \--- data/
+        \--- final
+             |   [final version files]
+        \--- supporting
+             |   [supporting files]
+        \--- licence/
+             |   licence.txt
+        \--- metadata/
+             |   metadata.xml
+        \--- tagfiles/
+            |   supporting.access.txt
+            |   formats.txt
+            |   final.sequence.txt
+        |   supporting.sequence.txt
+    */
     BagIt(String filePath) {
 
         Bag theBag = bagFactory.createBag(new File(filePath));
@@ -67,6 +86,8 @@ public class BagIt {
     /*
         returns the list of primary files in sequence
         data/final/[final version files] ordered by tagfiles/final.sequence.txt
+
+        R008 DSpace Item PRIMARY
      */
     public InputStream getPrimary() {
 
@@ -84,6 +105,8 @@ public class BagIt {
     /*
        returns the list of secondary files in sequence
        data/supporting/[supporting files] ordered by tagfiles/supporting.sequence.txt
+
+       R009 DSpace Item SECONDARY and R010 SECONDARY_RESTRICTED
     */
     public InputStream getSecondary() {
 
@@ -107,16 +130,19 @@ public class BagIt {
         tagfiles/supporting.access.txt
 
         will be open or closed
+        open -> DSpace Item SECONDARY
+        closed -> DSpace Item SECONDARY_RESTRICTED
     */
     public String getSupportingAccess(String filename) {
 
         return "open";
     }
 
-
     /*
         returns the metadata file
         data/metadata/metadata.xml
+
+        DSpace Item METADATA
      */
 
 
