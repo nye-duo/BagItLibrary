@@ -1,7 +1,45 @@
-BagIt Library for StudentWeb
-============================
+BagIt Library for StudentWeb & Duo-DSpace
+=========================================
 
 Introduction
 ------------
-This library enables the packaging of files and metadata from StudentWeb into Bags and the unpackaging of these Bags for
-use in Duo-DSpace.
+This library enables the packaging of files and metadata from StudentWeb into Bags and the unpackaging of these Bags for use in Duo-DSpace.
+
+The Bags have the following structure:
+
+<base directory>/
+ |   bagit.txt
+ |   manifest-md5.txt
+ |   tagmanifest-md5.txt
+ \--- data/
+       \--- final
+             |   [final version files]
+       \--- supporting
+             |   [supporting files]
+       \--- licence/
+             |   licence.txt
+       \--- metadata/
+             |   metadata.xml
+ \--- tagfiles/
+       |   supporting.access.txt
+       |   formats.txt
+       |   final.sequence.txt
+       |   supporting.sequence.txt
+
+Build/Install
+-------------
+
+This library depends on the Library of Congress BagIt Library version 4.1 which is not currently available
+in the Maven central repository.  It can be downloaded from:
+
+    http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download
+
+Once downloaded it should be compiled with:
+
+	mvn clean package
+
+and then installed into the local maven repository with
+
+	mvn install
+
+Once this is done, then it's possible to compile this library with "mvn clean package" too.
