@@ -33,7 +33,12 @@ import static org.junit.Assert.*;
 import gov.loc.repository.bagit.Bag;
 import gov.loc.repository.bagit.BagInfoTxt;
 import gov.loc.repository.bagit.BagItTxt;
+import gov.loc.repository.bagit.impl.ManifestWriterImpl;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class BagItTest {
 
@@ -78,9 +83,18 @@ public class BagItTest {
         try {
 
             assertFalse(bag.verifyValid().isSuccess());  // we don't have a payload manifest or bagit.txt
+
+            // now add some data files
+            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test1.txt"));
+            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test2.txt"));
+            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/bagitspec.pdf"));
+
+            assertEquals(3, bag.getPayload().size());
+
         }
         finally {
 
+            bag.close();
         }
 
     }
