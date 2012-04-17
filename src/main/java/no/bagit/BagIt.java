@@ -79,17 +79,56 @@ public class BagIt {
     }
 
     /*
-        adds a file to our BagIt
+        adds a payload file to our BagIt
      */
-    public void addFile(String directory, InputStream inputStream) {
+    public void addPrimaryFile(File file) {
+
+        theBag.addFileToPayload(file);
 
     }
+
+    public void addSecondaryFile(File file, String access) {
+
+        theBag.addFileToPayload(file);
+
+    }
+
+    /*
+        adds a tag file to our BagIt
+     */
+    public void addTagFile(File file) {
+
+        theBag.addFileAsTag(file);
+    }
+
+
+    /*
+        add a metadata file in the metadata directory
+     */
+    public void addMetadataFile(File file) {
+
+    }
+
+    /*
+        add a licence file in the licence directory
+     */
+    public void addLicenceFile(File file) {
+
+    }
+
+    /*
+        generates the payload manifest
+     */
+
+    /*
+        generates the tag manifest
+     */
 
 
 
     /*
        get the licence for the item
-    */
+     */
 
 
     /*
@@ -129,10 +168,23 @@ public class BagIt {
         return secondary;
     }
 
-
     /*
         verifies the bag against it's manifest
      */
+    public boolean verifyPayloadManifest() {
+
+        return theBag.verifyPayloadManifests().isSuccess();
+    }
+
+    /*
+        verifies the bag against it's tag manifest
+     */
+    public boolean verifyTagManifest() {
+
+        return theBag.verifyTagManifests().isSuccess();
+    }
+
+
 
     /*
         Looks for access set for filename in
