@@ -38,13 +38,11 @@ import org.junit.Test;
 public class BagItTest {
 
     /*
-
         create a bag from an existing directory in the correct format
-
      */
 
     @Test
-    public void testBagContructorExistingBag() throws Exception {
+    public void testBagConstructorExistingBag() throws Exception {
 
         BagIt testBagIt = new BagIt(System.getProperty("user.dir") + "/src/test/resources/testbags/testbag1");
         Bag bag = testBagIt.theBag;
@@ -60,10 +58,30 @@ public class BagItTest {
 
 
         } finally {
+
             bag.close();
         }
 
 
     }
 
+    /*
+        create empty bag
+     */
+
+    @Test
+    public void testBagConstructorEmptyBag() throws Exception {
+
+        BagIt testBagIt = new BagIt();
+        Bag bag = testBagIt.theBag;
+
+        try {
+
+            assertFalse(bag.verifyValid().isSuccess());  // we don't have a payload manifest or bagit.txt
+        }
+        finally {
+
+        }
+
+    }
 }

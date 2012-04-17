@@ -71,6 +71,12 @@ public class BagIt {
 
     }
 
+    /*
+        creates an empty BagIt
+     */
+    BagIt() {
+        theBag = bagFactory.createBag();
+    }
 
     /*
         adds a file to our BagIt
