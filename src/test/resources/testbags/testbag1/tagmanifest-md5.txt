@@ -1,0 +1,4 @@
+e7b03d2f2189736f8b2ffccf6f298f9e tagfiles/final.sequence.txt
+a54cc40942ffebd708396aea8023589d tagfiles/formats.txt
+0583718bb6235c3b798f0894d5da3fb5 tagfiles/supporting.access.txt
+e1883ad132eb3f09bd8e77dadc3b1ea1 tagfiles/supporting.sequence.txt

@@ -1,0 +1,4 @@
+acee501ade0a34d12ee743e256c15cca data/final/segway.jpg
+dee9f1464bee4894d7974b5ef666da18 data/metadata/metadata.xml
+e1775bfc52372bc29bff7f9a477a0460 data/licence/licence.txt
+8457466e927d80931b1c9461460eaf50 data/supporting/segway-detail.jpg
