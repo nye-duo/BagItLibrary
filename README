@@ -29,8 +29,7 @@ The Bags have the following structure:
 Build/Install
 -------------
 
-This library depends on the Library of Congress BagIt Library version 4.1 which is not currently available
-in the Maven central repository.  It can be downloaded from:
+This library depends on the Library of Congress BagIt Library version 4.1 which is not currently availablein the Maven central repository.  It can be downloaded from:
 
     http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download
 

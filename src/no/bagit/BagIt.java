@@ -78,6 +78,8 @@ public class BagIt {
 
     }
 
+
+
     /*
        get the licence for the item
     */
