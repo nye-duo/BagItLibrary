@@ -30,13 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import static org.junit.Assert.*;
 
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagInfoTxt;
-import gov.loc.repository.bagit.BagItTxt;
+import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.ManifestWriterImpl;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -79,6 +78,8 @@ public class BagItTest {
 
         BagIt testBagIt = new BagIt();
         Bag bag = testBagIt.theBag;
+        BagFactory bagFactory = testBagIt.bagFactory;
+        Bag.BagConstants bagConstants =
 
         try {
 
@@ -91,11 +92,48 @@ public class BagItTest {
 
             assertEquals(3, bag.getPayload().size());
 
+            assertFalse(bag.verifyValid().isSuccess()); // we still don't have a valid bag... create our manifest
+
+            bag.getBagConstants();
+
+            // now add our manifest
+            //BagFile bagItTxt = bag.getBagPartFactory().createBagItTxt();
+
+
+
+
+
+
+            //bag.getBagPartFactory().createBagInfoTxt();
+            //bag.getBagPartFactory().createManifest("manifest-md5.txt");
+
+            //assertTrue(bag.verifyValid().isSuccess()); // are we now valid?
+
         }
         finally {
 
             bag.close();
         }
 
+    }
+
+    /*
+        testing ability to add tag directory, i.e. secondary, licence and metadata
+     */
+    @Test
+    public void testTagDirectoryAddition() throws Exception {
+
+        BagIt testBagIt = new BagIt();
+        Bag bag = testBagIt.theBag;
+
+        try {
+
+
+
+        }
+        finally {
+
+            bag.close();
+        }
     }
 }

@@ -40,6 +40,57 @@ public class BagIt {
     // our BagFactory
     Bag theBag;
     BagFactory bagFactory = new BagFactory();
+    Bag.BagConstants bagConstants = new Bag.BagConstants() {
+        @Override
+        public String getPayloadManifestPrefix() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getTagManifestPrefix() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getPayloadManifestSuffix() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getTagManifestSuffix() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getBagEncoding() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getBagItTxt() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getDataDirectory() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getBagInfoTxt() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public String getFetchTxt() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public BagFactory.Version getVersion() {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
 
 
     /*
@@ -63,7 +114,7 @@ public class BagIt {
             |   supporting.access.txt
             |   formats.txt
             |   final.sequence.txt
-        |   supporting.sequence.txt
+            |   supporting.sequence.txt
     */
     BagIt(String filePath) {
 
@@ -76,6 +127,21 @@ public class BagIt {
      */
     BagIt() {
         theBag = bagFactory.createBag();
+
+        // create the data directory
+
+        // create the supporting directory
+
+        // create the licence directory
+
+        // create the metadata directory
+
+        // create the tagfiles directory
+
+        // create tagfiles/supporting.access.txt
+        // create tagfiles/formats.txt
+        // create tagfiles/final.sequence.txt
+        // create tagfiles/supporting.sequence.txt
     }
 
     /*
@@ -83,15 +149,29 @@ public class BagIt {
      */
     public void addPrimaryFile(File file) {
 
+        // add the file into the final directory (and manifest-md5.txt)
         theBag.addFileToPayload(file);
+
+        // add the format to tagfiles/formats.txt
+
+        // add the file to the final.sequence.txt
+
 
     }
 
     public void addSecondaryFile(File file, String access) {
 
+        // add the file into the supporting directory
         theBag.addFileToPayload(file);
 
+        // add the file tagfiles/supporting.access.txt as access (open|closed)
+
+        // add the format to tagfiles/formats.txt
+
+        // add the file to the supporting.sequence.txt
+
     }
+
 
     /*
         adds a tag file to our BagIt
@@ -107,12 +187,16 @@ public class BagIt {
      */
     public void addMetadataFile(File file) {
 
+        // add the format to tagfiles/formats.txt
+
     }
 
     /*
         add a licence file in the licence directory
      */
     public void addLicenceFile(File file) {
+
+        // add the format to tagfiles/formats.txt
 
     }
 
