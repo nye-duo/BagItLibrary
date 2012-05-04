@@ -79,7 +79,7 @@ public class BagItTest {
         BagIt testBagIt = new BagIt();
         Bag bag = testBagIt.theBag;
         BagFactory bagFactory = testBagIt.bagFactory;
-        Bag.BagConstants bagConstants =
+        Bag.BagConstants bagConstants = null;
 
         try {
 

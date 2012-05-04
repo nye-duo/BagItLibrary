@@ -34,6 +34,7 @@ import gov.loc.repository.bagit.BagFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.TreeMap;
 
 public class BagIt {
 
@@ -41,56 +42,56 @@ public class BagIt {
     Bag theBag;
     BagFactory bagFactory = new BagFactory();
     Bag.BagConstants bagConstants = new Bag.BagConstants() {
-        @Override
+
         public String getPayloadManifestPrefix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getTagManifestPrefix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getPayloadManifestSuffix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getTagManifestSuffix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getBagEncoding() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getBagItTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getDataDirectory() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getBagInfoTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public String getFetchTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
-        @Override
+
         public BagFactory.Version getVersion() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
-    }
+    };
 
 
     /*
@@ -116,16 +117,22 @@ public class BagIt {
             |   final.sequence.txt
             |   supporting.sequence.txt
     */
-    BagIt(String filePath) {
+    public BagIt(String filePath) {
 
         theBag = bagFactory.createBag(new File(filePath));
+
+    }
+
+    public BagIt(File file) {
+
+        theBag = bagFactory.createBag(file);
 
     }
 
     /*
         creates an empty BagIt
      */
-    BagIt() {
+    public BagIt() {
         theBag = bagFactory.createBag();
 
         // create the data directory
@@ -231,6 +238,26 @@ public class BagIt {
         };
 
         return primary;
+    }
+
+    public TreeMap<Integer, BaggedItem> getSequencedPrimaries()
+    {
+        return null;
+    }
+
+    public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights)
+    {
+        return null;
+    }
+
+    public BaggedItem getMetadata()
+    {
+        return null;
+    }
+
+    public BaggedItem getLicence()
+    {
+        return null;
     }
 
 
