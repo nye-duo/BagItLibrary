@@ -1,4 +1,4 @@
-package no.bagit;
+package no.uio.duo.bagit;
 
 /*
 Copyright (c) 2012, University of Oslo
@@ -79,7 +79,7 @@ public class BagItTest {
         BagIt testBagIt = new BagIt();
         Bag bag = testBagIt.theBag;
         BagFactory bagFactory = testBagIt.bagFactory;
-        Bag.BagConstants bagConstants =
+        //Bag.BagConstants bagConstants =
 
         try {
 
@@ -97,11 +97,7 @@ public class BagItTest {
             bag.getBagConstants();
 
             // now add our manifest
-            //BagFile bagItTxt = bag.getBagPartFactory().createBagItTxt();
-
-
-
-
+            BagFile bagItTxt = bag.getBagPartFactory().createBagItTxt();
 
 
             //bag.getBagPartFactory().createBagInfoTxt();
@@ -136,4 +132,6 @@ public class BagItTest {
             bag.close();
         }
     }
+
+
 }

@@ -1,4 +1,4 @@
-package no.bagit;
+package no.uio.duo.bagit;
 
 /*
 Copyright (c) 2012, University of Oslo
@@ -90,7 +90,7 @@ public class BagIt {
         public BagFactory.Version getVersion() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
-    }
+    };
 
 
     /*
