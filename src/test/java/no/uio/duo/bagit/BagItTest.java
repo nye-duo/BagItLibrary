@@ -78,32 +78,47 @@ public class BagItTest {
 
         BagIt testBagIt = new BagIt();
         Bag bag = testBagIt.theBag;
-        BagFactory bagFactory = testBagIt.bagFactory;
-        //Bag.BagConstants bagConstants =
+        //BagFactory bagFactory = testBagIt.bagFactory;
 
         try {
 
             assertFalse(bag.verifyValid().isSuccess());  // we don't have a payload manifest or bagit.txt
 
-            // now add some data files
-            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test1.txt"));
-            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test2.txt"));
-            testBagIt.addPrimaryFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/bagitspec.pdf"));
+            // we haven't had any files to the pay load yet
+            assertEquals(0, bag.getPayload().size());
 
+            // we should have our 4 tag files already
+            assertEquals(4, bag.getTags().size());
+
+            // now add some data files
+            testBagIt.addFinalFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/bagitspec.pdf"));
+
+            // check we can now fetch the file
+            assertNotNull(bag.getBagFile("data/final/bagitspec.pdf"));
+
+            // check that the files have been added to the payload
+            assertEquals(1, bag.getPayload().size());
+
+            // now add some supporting files
+            testBagIt.addSupportingFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test1.txt"), "open");
+            testBagIt.addSupportingFile(new File(System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/test2.txt"), "open");
+
+            // we should now have 3
             assertEquals(3, bag.getPayload().size());
 
-            assertFalse(bag.verifyValid().isSuccess()); // we still don't have a valid bag... create our manifest
+            // check we can get the files
+            assertNotNull(bag.getBagFile("data/supporting/test1.txt"));
+            assertNotNull(bag.getBagFile("data/supporting/test2.txt"));
+            assertNull(bag.getBagFile("data/supporting/test3.txt"));
 
-            bag.getBagConstants();
+            // we still don't have a valid bag... create our manifest
+            assertFalse(bag.verifyValid().isSuccess());
 
-            // now add our manifest
-            BagFile bagItTxt = bag.getBagPartFactory().createBagItTxt();
+            // now generate our manifest
+            testBagIt.generateManifests();
 
-
-            //bag.getBagPartFactory().createBagInfoTxt();
-            //bag.getBagPartFactory().createManifest("manifest-md5.txt");
-
-            //assertTrue(bag.verifyValid().isSuccess()); // are we now valid?
+            // are we now valid?
+            assertTrue(bag.verifyValid().isSuccess());
 
         }
         finally {
@@ -112,26 +127,5 @@ public class BagItTest {
         }
 
     }
-
-    /*
-        testing ability to add tag directory, i.e. secondary, licence and metadata
-     */
-    @Test
-    public void testTagDirectoryAddition() throws Exception {
-
-        BagIt testBagIt = new BagIt();
-        Bag bag = testBagIt.theBag;
-
-        try {
-
-
-
-        }
-        finally {
-
-            bag.close();
-        }
-    }
-
 
 }

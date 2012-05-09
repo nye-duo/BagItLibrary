@@ -28,69 +28,32 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagFactory;
+import gov.loc.repository.bagit.*;
+import gov.loc.repository.bagit.impl.FileBagFile;
+import gov.loc.repository.bagit.transformer.impl.DefaultCompleter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import gov.loc.repository.bagit.transformer.impl.TagManifestCompleter;
+import gov.loc.repository.bagit.utilities.MessageDigestHelper;
+import gov.loc.repository.bagit.writer.impl.FileSystemHelper;
+import org.apache.commons.io.FileUtils;
+
+import javax.activation.MimetypesFileTypeMap;
+import java.io.*;
+import java.text.MessageFormat;
 
 public class BagIt {
 
     // our BagFactory
     Bag theBag;
     BagFactory bagFactory = new BagFactory();
-    Bag.BagConstants bagConstants = new Bag.BagConstants() {
-        @Override
-        public String getPayloadManifestPrefix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
+    DefaultCompleter completer = new DefaultCompleter(bagFactory);
+    Manifest manifest;
+    TagManifestCompleter tagmanifest;
 
-        @Override
-        public String getTagManifestPrefix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getPayloadManifestSuffix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getTagManifestSuffix() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getBagEncoding() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getBagItTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getDataDirectory() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getBagInfoTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getFetchTxt() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public BagFactory.Version getVersion() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-    };
+    File supportingAccess;
+    File formats;
+    File finalSequence;
+    File supportingSequence;
 
 
     /*
@@ -102,14 +65,14 @@ public class BagIt {
         |   manifest-md5.txt
         |   tagmanifest-md5.txt
         \--- data/
-        \--- final
-             |   [final version files]
-        \--- supporting
-             |   [supporting files]
-        \--- licence/
-             |   licence.txt
-        \--- metadata/
-             |   metadata.xml
+            \--- final
+                |   [final version files]
+            \--- supporting
+                |   [supporting files]
+            \--- licence/
+                |   licence.txt
+            \--- metadata/
+                |   metadata.xml
         \--- tagfiles/
             |   supporting.access.txt
             |   formats.txt
@@ -123,52 +86,109 @@ public class BagIt {
     }
 
     /*
-        creates an empty BagIt
+        creates an empty BagIt according to our BagIt structure
      */
     BagIt() {
-        theBag = bagFactory.createBag();
 
-        // create the data directory
+        theBag = bagFactory.createBag(BagFactory.Version.V0_97);
 
-        // create the supporting directory
+        tagmanifest = new TagManifestCompleter(bagFactory);
+        manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
 
-        // create the licence directory
 
-        // create the metadata directory
+        // create the tagfiles
 
-        // create the tagfiles directory
+        try {
 
-        // create tagfiles/supporting.access.txt
-        // create tagfiles/formats.txt
-        // create tagfiles/final.sequence.txt
-        // create tagfiles/supporting.sequence.txt
+            //create tagfiles directory
+
+            // create tagfiles/supporting.access.txt
+            supportingAccess = new File("supporting.access.txt");
+            FileUtils.touch(supportingAccess);
+            theBag.addFileAsTag(supportingAccess);
+
+            // create tagfiles/formats.txt
+            formats = new File("formats.txt");
+            FileUtils.touch(formats);
+            theBag.addFileAsTag(formats);
+
+            // create tagfiles/final.sequence.txt
+            finalSequence = new File("final.sequence.txt");
+            FileUtils.touch(finalSequence);
+            theBag.addFileAsTag(finalSequence);
+
+            // create tagfiles/supporting.sequence.txt
+            supportingSequence = new File("supporting.sequence.txt");
+            FileUtils.touch(supportingSequence);
+            theBag.addFileAsTag(supportingSequence);
+
+            tagmanifest.complete(theBag);
+
+        }
+        catch (IOException e) {
+
+            System.err.println("Caught IOException: " + e.getMessage());
+        }
     }
 
     /*
-        adds a payload file to our BagIt
+        adds a final file to our BagIt
      */
-    public void addPrimaryFile(File file) {
+
+    public void addFinalFile(File file) throws IOException {
+
+        // new file (according to our nomenclature
+        File finalFile = new File("final/" + file.getName());
+
+        // copy the file to where we need it
+        FileUtils.copyFile(file, finalFile);
 
         // add the file into the final directory (and manifest-md5.txt)
-        theBag.addFileToPayload(file);
+        theBag.addFileToPayload(finalFile.getParentFile());
+        // theBag.putBagFile(new FileBagFile("data/final", finalFile));
+
+        // data final directory
+        String dataFinal = "data/final/";
 
         // add the format to tagfiles/formats.txt
+        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n", true);
 
         // add the file to the final.sequence.txt
+        FileUtils.writeStringToFile(finalSequence, dataFinal + finalFile.getName() + "\n", true);
 
+        // generate the checksum
+        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataFinal + finalFile.getName(), finalFile).newInputStream(), Manifest.Algorithm.MD5);
 
+        // add file to payload manifest
+        manifest.put(dataFinal + finalFile.getName(), checksum);
     }
 
-    public void addSecondaryFile(File file, String access) {
+    /*
+        adds a supporting file to our BagIt
+     */
+
+    public void addSupportingFile(File file, String access) throws IOException {
+
+        // new file (according to our nomenclature
+        File supportingFile = new File("supporting/" + file.getName());
+
+        // copy the file to where we need it
+        FileUtils.copyFile(file, supportingFile);
 
         // add the file into the supporting directory
-        theBag.addFileToPayload(file);
+        theBag.addFileToPayload(supportingFile.getParentFile());
+
+        // data supporting directory
+        String dataSupporting = "data/supporting/";
 
         // add the file tagfiles/supporting.access.txt as access (open|closed)
+        FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the format to tagfiles/formats.txt
+        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
+        FileUtils.writeStringToFile(supportingSequence, dataSupporting + file.getName() + "\n", true);
 
     }
 
@@ -185,30 +205,59 @@ public class BagIt {
     /*
         add a metadata file in the metadata directory
      */
-    public void addMetadataFile(File file) {
+    public void addMetadataFile(File file) throws IOException {
+
+        // new file (according to our nomenclature
+        File metadataFile = new File("metadata/" + file.getName());
+
+        // copy the file to where we need it
+        FileUtils.copyFile(file, metadataFile);
+
+        // add the file into the supporting directory
+        theBag.addFileToPayload(metadataFile.getParentFile());
+
+        // data metadata directory
+        String dataMetadata = "data/metadata/";
 
         // add the format to tagfiles/formats.txt
+        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n", true);
 
     }
 
     /*
         add a licence file in the licence directory
      */
-    public void addLicenceFile(File file) {
+    public void addLicenceFile(File file) throws IOException {
+
+        // new file (according to our nomenclature
+        File licenceFile = new File("licence/" + file.getName());
+
+        // copy the file to where we need it
+        FileUtils.copyFile(file, licenceFile);
+
+        // add the file into the supporting directory
+        theBag.addFileToPayload(licenceFile.getParentFile());
+
+        // data metadata directory
+        String dataLicence = "data/licence/";
 
         // add the format to tagfiles/formats.txt
+        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n", true);
 
     }
 
     /*
-        generates the payload manifest
+        generates the manifests
      */
 
-    /*
-        generates the tag manifest
-     */
+    public void generateManifests() {
 
+        theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
+        theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
+        theBag.putBagFile(manifest);
+        theBag.makeComplete();
 
+    }
 
     /*
        get the licence for the item
