@@ -30,16 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.FileBagFile;
-import gov.loc.repository.bagit.transformer.impl.DefaultCompleter;
-
-import gov.loc.repository.bagit.transformer.impl.TagManifestCompleter;
 import gov.loc.repository.bagit.utilities.MessageDigestHelper;
-import gov.loc.repository.bagit.writer.impl.FileSystemHelper;
 import org.apache.commons.io.FileUtils;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.TreeMap;
 
 public class BagIt {
@@ -47,15 +42,13 @@ public class BagIt {
     // our BagFactory
     Bag theBag;
     BagFactory bagFactory = new BagFactory();
-    DefaultCompleter completer = new DefaultCompleter(bagFactory);
     Manifest manifest;
     Manifest tagmanifest;
 
-    File supportingAccess;
     File formats;
     File finalSequence;
     File supportingSequence;
-
+    File supportingAccess;
 
     /*
         creates a BagIt from an existing directory organised in the correct
@@ -80,26 +73,20 @@ public class BagIt {
             |   final.sequence.txt
             |   supporting.sequence.txt
     */
-    public BagIt(String filePath) {
+    public BagIt(String filePath) throws IOException {
 
         theBag = bagFactory.createBag(new File(filePath));
 
-        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
-        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
+        setManifestsAndTagfiles();
 
     }
 
-    public BagIt(File file) {
+    public BagIt(File file) throws IOException {
 
         theBag = bagFactory.createBag(file);
 
-        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
-        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
-
-
+        setManifestsAndTagfiles();
     }
-
-
 
     /*
         creates an empty BagIt according to our BagIt structure
@@ -118,11 +105,6 @@ public class BagIt {
 
             //create tagfiles directory
 
-            // create tagfiles/supporting.access.txt
-            supportingAccess = new File("supporting.access.txt");
-            FileUtils.touch(supportingAccess);
-            theBag.addFileAsTag(supportingAccess);
-
             // create tagfiles/formats.txt
             formats = new File("formats.txt");
             FileUtils.touch(formats);
@@ -138,11 +120,35 @@ public class BagIt {
             FileUtils.touch(supportingSequence);
             theBag.addFileAsTag(supportingSequence);
 
+            // create tagfiles/supporting.access.txt
+            supportingAccess = new File("supporting.access.txt");
+            FileUtils.touch(supportingAccess);
+            theBag.addFileAsTag(supportingAccess);
+
+
         }
         catch (IOException e) {
 
             System.err.println("Caught IOException: " + e.getMessage());
         }
+    }
+
+    public void setManifestsAndTagfiles() throws IOException {
+
+        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
+        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
+
+        formats = new File("formats.txt");
+        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/formats.txt").newInputStream(), formats);
+
+        finalSequence = new File("final.sequence.txt");
+        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/final.sequence.txt").newInputStream(), finalSequence);
+
+        supportingSequence = new File("supporting.sequence.txt");
+        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/supporting.sequence.txt").newInputStream(), supportingSequence);
+
+        supportingAccess = new File("supporting.access.txt");
+        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), supportingAccess);
     }
 
     /*
@@ -195,14 +201,14 @@ public class BagIt {
         // data supporting directory
         String dataSupporting = "data/supporting/";
 
-        // add the file tagfiles/supporting.access.txt as access (open|closed)
-        FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
-
         // add the format to tagfiles/formats.txt
         FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
         FileUtils.writeStringToFile(supportingSequence, dataSupporting + file.getName() + "\n", true);
+
+        // add the file tagfiles/supporting.access.txt as access (open|closed)
+        FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
     }
 
@@ -227,7 +233,7 @@ public class BagIt {
         // copy the file to where we need it
         FileUtils.copyFile(file, metadataFile);
 
-        // add the file into the supporting directory
+        // add the file into the metadata directory
         theBag.addFileToPayload(metadataFile.getParentFile());
 
         // data metadata directory
@@ -249,7 +255,7 @@ public class BagIt {
         // copy the file to where we need it
         FileUtils.copyFile(file, licenceFile);
 
-        // add the file into the supporting directory
+        // add the file into the licence directory
         theBag.addFileToPayload(licenceFile.getParentFile());
 
         // data metadata directory
@@ -286,6 +292,7 @@ public class BagIt {
     {
 
         // look through tagfiles/final.sequence.txt
+        BagFile bagFinalSequence = theBag.getBagFile("tagfiles/final.sequence.txt");
 
         // get each BagFile in sequence and put it in a BaggedItem
 
