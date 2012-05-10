@@ -49,7 +49,7 @@ public class BagIt {
     BagFactory bagFactory = new BagFactory();
     DefaultCompleter completer = new DefaultCompleter(bagFactory);
     Manifest manifest;
-    TagManifestCompleter tagmanifest;
+    Manifest tagmanifest;
 
     File supportingAccess;
     File formats;
@@ -84,11 +84,18 @@ public class BagIt {
 
         theBag = bagFactory.createBag(new File(filePath));
 
+        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
+        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
+
     }
 
     public BagIt(File file) {
 
         theBag = bagFactory.createBag(file);
+
+        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
+        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
+
 
     }
 
@@ -99,14 +106,14 @@ public class BagIt {
      */
     public BagIt() {
 
+        // create the bag
         theBag = bagFactory.createBag(BagFactory.Version.V0_97);
 
-        tagmanifest = new TagManifestCompleter(bagFactory);
+        // create our manifests
         manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
-
+        tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
 
         // create the tagfiles
-
         try {
 
             //create tagfiles directory
@@ -130,8 +137,6 @@ public class BagIt {
             supportingSequence = new File("supporting.sequence.txt");
             FileUtils.touch(supportingSequence);
             theBag.addFileAsTag(supportingSequence);
-
-            tagmanifest.complete(theBag);
 
         }
         catch (IOException e) {
@@ -264,6 +269,7 @@ public class BagIt {
         theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
         theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
         theBag.putBagFile(manifest);
+        theBag.putBagFile(tagmanifest);
         theBag.makeComplete();
 
     }
