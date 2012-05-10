@@ -323,7 +323,12 @@ public class BagIt {
 
     public BaggedItem getMetadata()
     {
-        return null;
+        BaggedItem metadata = new BaggedItem();
+        metadata.setInputStream(theBag.getBagFile("data/metadata/metadata.xml").newInputStream());
+        metadata.setFilename("metadata.xml");
+        metadata.setFormat("text/xml");
+
+        return metadata;
     }
 
 
@@ -334,7 +339,12 @@ public class BagIt {
 
     public BaggedItem getLicence()
     {
-        return null;
+        BaggedItem licence = new BaggedItem();
+        licence.setInputStream(theBag.getBagFile("data/licence/licence.txt").newInputStream());
+        licence.setFilename("licence.txt");
+        licence.setFormat("text/plain");
+
+        return licence;
     }
 
 
