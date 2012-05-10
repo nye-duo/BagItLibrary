@@ -40,6 +40,7 @@ import org.apache.commons.io.FileUtils;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.text.MessageFormat;
+import java.util.TreeMap;
 
 public class BagIt {
 
@@ -259,10 +260,6 @@ public class BagIt {
 
     }
 
-    /*
-       get the licence for the item
-     */
-
 
     /*
         returns the list of primary files in sequence
@@ -270,16 +267,10 @@ public class BagIt {
 
         R008 DSpace Item PRIMARY
      */
-    public InputStream getPrimary() {
 
-        InputStream primary = new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return 0;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
-
-        return primary;
+    public TreeMap<Integer, BaggedItem> getSequencedPrimaries()
+    {
+        return null;
     }
 
 
@@ -289,17 +280,35 @@ public class BagIt {
 
        R009 DSpace Item SECONDARY and R010 SECONDARY_RESTRICTED
     */
-    public InputStream getSecondary() {
 
-        InputStream secondary = new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return 0;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-        };
 
-        return secondary;
+    public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights)
+    {
+        return null;
     }
+
+
+    /*
+      returns the metadata
+      data/metadata/metadata.xml
+    */
+
+    public BaggedItem getMetadata()
+    {
+        return null;
+    }
+
+
+    /*
+      returns the licence for the item
+      data/licence/licence.txt
+    */
+
+    public BaggedItem getLicence()
+    {
+        return null;
+    }
+
 
     /*
         verifies the bag against it's manifest
