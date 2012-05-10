@@ -80,16 +80,24 @@ public class BagIt {
             |   final.sequence.txt
             |   supporting.sequence.txt
     */
-    BagIt(String filePath) {
+    public BagIt(String filePath) {
 
         theBag = bagFactory.createBag(new File(filePath));
 
     }
 
+    public BagIt(File file) {
+
+        theBag = bagFactory.createBag(file);
+
+    }
+
+
+
     /*
         creates an empty BagIt according to our BagIt structure
      */
-    BagIt() {
+    public BagIt() {
 
         theBag = bagFactory.createBag(BagFactory.Version.V0_97);
 
@@ -270,6 +278,13 @@ public class BagIt {
 
     public TreeMap<Integer, BaggedItem> getSequencedPrimaries()
     {
+
+        // look through tagfiles/final.sequence.txt
+
+        // get each BagFile in sequence and put it in a BaggedItem
+
+        // add it to our tree
+
         return null;
     }
 
