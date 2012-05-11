@@ -151,14 +151,12 @@ public class BagItTest {
             assertTrue(bag.getBagFile("tagfiles/formats.txt").exists());
 
             // check the final sequence file exists
-            // hash map of formats
-            HashMap<String, String> formatMap = testBagIt.getFormatMap();
 
             // check how many entries there are
-            assertEquals(4, formatMap.size());
+            assertEquals(4, testBagIt.formatMap.size());
 
             // check the primary entry
-            assertEquals("image/jpeg", formatMap.get("data/final/segway.jpg"));
+            assertEquals("image/jpeg", testBagIt.formatMap.get("data/final/segway.jpg"));
 
             // check the final sequence file exists
             assertTrue(bag.getBagFile("tagfiles/final.sequence.txt").exists());
