@@ -53,6 +53,12 @@ public class BagIt {
     File supportingSequence;
     File supportingAccess;
 
+    HashMap<String, String> formatMap;
+    HashMap<String, String> accessMap;
+
+    int finalSequenceCounter = 1;
+    int supportingSequenceCounter = 1;
+
     /*
         creates a BagIt from an existing directory organised in the correct
         format
@@ -89,6 +95,7 @@ public class BagIt {
         theBag = bagFactory.createBag(file);
 
         setManifestsAndTagfiles();
+
     }
 
     /*
@@ -152,6 +159,11 @@ public class BagIt {
 
         supportingAccess = new File("supporting.access.txt");
         FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), supportingAccess);
+
+        setFormatMap();
+
+        setAccessMap();
+
     }
 
     /*
@@ -177,7 +189,10 @@ public class BagIt {
         FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n", true);
 
         // add the file to the final.sequence.txt
-        FileUtils.writeStringToFile(finalSequence, dataFinal + finalFile.getName() + "\n", true);
+        FileUtils.writeStringToFile(finalSequence, finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n", true);
+
+        // increment the sequence
+        finalSequenceCounter++;
 
         // generate the checksum
         String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataFinal + finalFile.getName(), finalFile).newInputStream(), Manifest.Algorithm.MD5);
@@ -208,7 +223,10 @@ public class BagIt {
         FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
-        FileUtils.writeStringToFile(supportingSequence, dataSupporting + file.getName() + "\n", true);
+        FileUtils.writeStringToFile(supportingSequence, supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n", true);
+
+        // increment the sequence
+        supportingSequenceCounter++;
 
         // add the file tagfiles/supporting.access.txt as access (open|closed)
         FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
@@ -273,7 +291,7 @@ public class BagIt {
         generates the manifests
      */
 
-    public void generateManifests() {
+    public void generateManifests() throws IOException {
 
         theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
         theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
@@ -288,10 +306,10 @@ public class BagIt {
         returns a hashmap of formats read from tagfiles/formats.txt
      */
 
-    public HashMap<String, String> getFormatMap() throws IOException {
+    public void setFormatMap() throws IOException {
 
         // hash map of formats
-        HashMap<String, String> formatMap = new HashMap<String, String>();
+        formatMap = new HashMap<String, String>();
 
         // bag file of formats
         BagFile bagFormats = theBag.getBagFile("tagfiles/formats.txt");
@@ -327,19 +345,16 @@ public class BagIt {
             LineIterator.closeQuietly(iterator);
         }
 
-        // return the hash map of formats
-        return formatMap;
-
     }
 
     /*
        returns a hashmap of access rights read from tagfiles/supporting.access.txt
     */
 
-    public HashMap<String, String> getAccessMap() throws IOException {
+    public void setAccessMap() throws IOException {
 
         // hash map of access rights
-        HashMap<String, String> accessMap = new HashMap<String, String>();
+        accessMap = new HashMap<String, String>();
 
         // bag file of access rights
         BagFile bagAccessRights = theBag.getBagFile("tagfiles/supporting.access.txt");
@@ -375,9 +390,6 @@ public class BagIt {
             LineIterator.closeQuietly(iterator);
         }
 
-        // return the hash map of formats
-        return accessMap;
-
     }
 
 
@@ -389,9 +401,6 @@ public class BagIt {
      */
 
     public TreeMap<Integer, BaggedItem> getSequencedPrimaries() throws IOException {
-
-        // get the formats hash map
-        HashMap<String, String> formatMap = getFormatMap();
 
         // look through tagfiles/final.sequence.txt
         BagFile bagFinalSequence = theBag.getBagFile("tagfiles/final.sequence.txt");
@@ -450,12 +459,6 @@ public class BagIt {
 
 
     public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights) throws IOException {
-
-        // get the formats hash map
-        HashMap<String, String> formatMap = getFormatMap();
-
-        // get the access hash map
-        HashMap<String, String> accessMap = getAccessMap();
 
         // look through tagfiles/supporting.sequence.txt
         BagFile bagSupportingSequence = theBag.getBagFile("tagfiles/supporting.sequence.txt");
@@ -553,9 +556,6 @@ public class BagIt {
         closed -> DSpace Item SECONDARY_RESTRICTED
     */
     public String getSupportingAccess(String filename) throws IOException {
-
-        // get the access hash map
-        HashMap<String, String> accessMap = getAccessMap();
 
         return accessMap.get(filename);
 
