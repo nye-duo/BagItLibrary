@@ -32,12 +32,16 @@ import static org.junit.Assert.*;
 
 import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.ManifestWriterImpl;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class BagItTest {
 
@@ -55,6 +59,8 @@ public class BagItTest {
 
             assertTrue(bag.verifyValid().isSuccess());
             assertEquals(4, bag.getPayload().size());
+            assertEquals(7, bag.getTags().size());
+            assertEquals(1, bag.getPayloadManifests().size());
             assertEquals(1, bag.getTagManifests().size());
             BagItTxt bagIt = bag.getBagItTxt();
             assertEquals("UTF-8", bagIt.getCharacterEncoding());
@@ -125,6 +131,63 @@ public class BagItTest {
 
             bag.close();
         }
+
+    }
+
+    /*
+        create a bag and get primaries
+     */
+    @Test
+    public void testBagGetPrimaries() throws Exception {
+
+        BagIt testBagIt = new BagIt(System.getProperty("user.dir") + "/src/test/resources/testbags/testbag1");
+        Bag bag = testBagIt.theBag;
+
+        try {
+
+            assertTrue(bag.verifyValid().isSuccess());
+
+            // check the formats file exists
+            assertTrue(bag.getBagFile("tagfiles/formats.txt").exists());
+
+            // check the final sequence file exists
+            // hash map of formats
+            HashMap<String, String> formatMap = testBagIt.getFormatMap();
+
+            // check how many entries there are
+            assertEquals(4, formatMap.size());
+
+            // check the primary entry
+            assertEquals("image/jpeg", formatMap.get("data/final/segway.jpg"));
+
+            // check the final sequence file exists
+            assertTrue(bag.getBagFile("tagfiles/final.sequence.txt").exists());
+
+            // look through tagfiles/final.sequence.txt
+            BagFile bagFinalSequence = bag.getBagFile("tagfiles/final.sequence.txt");
+
+            // superfluous check
+            assertTrue(bagFinalSequence.exists());
+
+            // get the primaries
+            TreeMap<Integer, BaggedItem> primaries = testBagIt.getSequencedPrimaries();
+            assertEquals("segway.jpg", primaries.get(1).getFilename());
+            assertEquals("image/jpeg", primaries.get(1).getFormat());
+            assertEquals((Integer)1, primaries.get(1).getSequence());
+
+            // get the open secondaries
+            TreeMap<Integer, BaggedItem> secondaries = testBagIt.getSequencedSecondaries("open");
+            assertEquals("segway-detail.jpg", secondaries.get(1).getFilename());
+            assertEquals("image/jpeg", secondaries.get(1).getFormat());
+            assertEquals((Integer)1, secondaries.get(1).getSequence());
+
+
+        } finally {
+
+            bag.close();
+        }
+
+
 
     }
 
