@@ -3,7 +3,8 @@ BagIt Library for StudentWeb & Duo-DSpace
 
 Introduction
 ------------
-This library enables the packaging of files and metadata from StudentWeb into Bags and the unpackaging of these Bags for use in Duo-DSpace.
+This library enables the packaging of files and metadata from StudentWeb into Bags and the unpackaging of these Bags for
+ use in Duo-DSpace.
 
 The Bags have the following structure:
 
@@ -29,7 +30,8 @@ The Bags have the following structure:
 Build/Install
 -------------
 
-This library depends on the Library of Congress BagIt Library version 4.1 which is not currently availablein the Maven central repository.  It can be downloaded from:
+This library depends on the Library of Congress BagIt Library version 4.1 which is not currently availablein the Maven
+central repository.  It can be downloaded from:
 
     http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download
 
@@ -42,3 +44,17 @@ and then installed into the local maven repository with
 	mvn install
 
 Once this is done, then it's possible to compile this library with "mvn clean package" too.
+
+Creating Bags
+-------------
+
+A BagIt object can be created by passing it an existing bag using BagIt(File file) where the file could be the bag zip
+file or a bag directory (non-serialised). A BagIt object can be built up using the library as follows:
+
+ Bag newBag = new BagIt();
+
+ and then adding all the final files using addFinalFile(File file, int sequence) and the supporting files using
+ addSupportingFile(File file, int sequence, String access).
+
+ Once all the files have been added, the manifests and tagfiles are then created with setManifestsAndTagfiles(). This
+ completes the bag and creates all the necessary files.
