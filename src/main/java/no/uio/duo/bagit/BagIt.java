@@ -37,7 +37,6 @@ import org.apache.commons.io.LineIterator;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TreeMap;
 
 public class BagIt {
@@ -170,7 +169,14 @@ public class BagIt {
         adds a final file to our BagIt
      */
 
-    public void addFinalFile(File file) throws IOException {
+    public void addFinalFile(File file, int sequence) throws IOException {
+
+        // check if we have a sequence
+        if (sequence > 0)
+        {
+            // set out sequence counter to the right value
+            finalSequenceCounter = sequence;
+        }
 
         // new file (according to our nomenclature
         File finalFile = new File("final/" + file.getName());
@@ -191,7 +197,7 @@ public class BagIt {
         // add the file to the final.sequence.txt
         FileUtils.writeStringToFile(finalSequence, finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n", true);
 
-        // increment the sequence
+        // increment the sequence counter
         finalSequenceCounter++;
 
         // generate the checksum
@@ -201,11 +207,24 @@ public class BagIt {
         manifest.put(dataFinal + finalFile.getName(), checksum);
     }
 
+    public void addFinalFile(File file) throws IOException {
+
+        // if we don't have a sequence number
+        addFinalFile(file, -1);
+    }
+
     /*
         adds a supporting file to our BagIt
      */
 
-    public void addSupportingFile(File file, String access) throws IOException {
+    public void addSupportingFile(File file, int sequence, String access) throws IOException {
+
+        // check if we have a sequence
+        if (sequence > 0)
+        {
+            // set out sequence counter to the right value
+            supportingSequenceCounter = sequence;
+        }
 
         // new file (according to our nomenclature
         File supportingFile = new File("supporting/" + file.getName());
@@ -231,6 +250,12 @@ public class BagIt {
         // add the file tagfiles/supporting.access.txt as access (open|closed)
         FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
+    }
+
+    public void addSupportingFile(File file, String access) throws IOException {
+
+        // if we don't have a sequence number
+        addSupportingFile(file, -1, access);
     }
 
 
