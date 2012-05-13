@@ -31,7 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import static org.junit.Assert.*;
 
 import gov.loc.repository.bagit.*;
+import gov.loc.repository.bagit.filesystem.DirNode;
+import gov.loc.repository.bagit.filesystem.FileSystem;
+import gov.loc.repository.bagit.filesystem.FileSystemNode;
+import gov.loc.repository.bagit.filesystem.impl.FileFileSystem;
+import gov.loc.repository.bagit.filesystem.impl.ZipFileSystem;
 import gov.loc.repository.bagit.impl.ManifestWriterImpl;
+import gov.loc.repository.bagit.utilities.FormatHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.junit.Test;
@@ -40,7 +46,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeMap;
 
 public class BagItTest {
@@ -59,7 +67,7 @@ public class BagItTest {
 
             assertTrue(bag.verifyValid().isSuccess());
             assertEquals(4, bag.getPayload().size());
-            assertEquals(7, bag.getTags().size());
+            assertEquals(8, bag.getTags().size());
             assertEquals(1, bag.getPayloadManifests().size());
             assertEquals(1, bag.getTagManifests().size());
             BagItTxt bagIt = bag.getBagItTxt();
@@ -189,4 +197,27 @@ public class BagItTest {
 
     }
 
+    /*
+       create a bag from a zip and check values
+    */
+    @Test
+    public void testBagZip() throws Exception {
+
+        BagIt testBagIt = new BagIt(System.getProperty("user.dir") + "/src/test/resources/testbags/testbag2.zip");
+        Bag bag = testBagIt.theBag;
+
+        try {
+
+            // check the bag file
+
+            assertEquals("application/octet-stream", testBagIt.getMimetype());
+            assertEquals("9aa9ab28654f1b995cb414ea387cb100", testBagIt.getMD5());
+            assertEquals("zip", testBagIt.getPackaging());
+
+        } finally {
+
+            bag.close();
+        }
+
+    }
 }
