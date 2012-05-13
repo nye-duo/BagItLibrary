@@ -320,6 +320,7 @@ public class BagIt {
 
         theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
         theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
+        theBag.putBagFile(theBag.getBagPartFactory().createFetchTxt());
         theBag.putBagFile(manifest);
         theBag.putBagFile(tagmanifest);
         theBag.makeComplete();
@@ -602,6 +603,47 @@ public class BagIt {
         return theBag.verifyTagManifests().isSuccess();
     }
 
+    /*
+        gets the file for the bag
+     */
+    public InputStream getFile() throws IOException {
+
+        return FileUtils.openInputStream(theBag.getFile());
+    }
+
+    /*
+        gets the file name for the bag
+     */
+    public String getName() {
+
+        return theBag.getFile().getName();
+    }
+
+    /*
+        gets the MD5 for the bag
+     */
+    public String getMD5() {
+
+        return (MessageDigestHelper.generateFixity(theBag.getFile(), Manifest.Algorithm.MD5));
+    }
+
+    /*
+        gets the mimetype for the bag
+     */
+
+    public String getMimetype() {
+
+        return new MimetypesFileTypeMap().getContentType(theBag.getFile());
+    }
+
+    /*
+        gets the packaging for the bag
+     */
+
+    public String getPackaging() {
+
+        return theBag.getFormat().scheme;
+    }
 
 
 } // end public class BagIt
