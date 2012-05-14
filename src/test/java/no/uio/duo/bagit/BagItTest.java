@@ -210,7 +210,7 @@ public class BagItTest {
 
             // check the bag file
 
-            assertEquals("application/octet-stream", testBagIt.getMimetype());
+            assertEquals("application/zip", testBagIt.getMimetype());
             assertEquals("9aa9ab28654f1b995cb414ea387cb100", testBagIt.getMD5());
             assertEquals("zip", testBagIt.getPackaging());
 

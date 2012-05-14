@@ -559,7 +559,12 @@ public class BagIt {
 
     public String getMimetype() {
 
-        return new MimetypesFileTypeMap().getContentType(theBag.getFile());
+        if (theBag.getFormat().scheme.equals("zip")) {
+            return "application/zip";
+        }
+        else {
+            return new MimetypesFileTypeMap().getContentType(theBag.getFile());
+        }
     }
 
     /*
