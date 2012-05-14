@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.FileBagFile;
+import gov.loc.repository.bagit.transfer.FetchedFileDestinationFactory;
 import gov.loc.repository.bagit.utilities.MessageDigestHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -110,28 +111,6 @@ public class BagIt {
         manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
         tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
 
-        // create the tagfiles
-        //formats = new File("tagfiles/formats.txt");
-        //theBag.addFileAsTag(formats);
-
-        // create tagfiles/final.sequence.txt
-        //finalSequence = new File("tagfiles/final.sequence.txt");
-        //theBag.addFileAsTag(finalSequence);
-
-        // create tagfiles/supporting.sequence.txt
-        //supportingSequence = new File("tagfiles/supporting.sequence.txt");
-        //theBag.addFileAsTag(supportingSequence);
-
-        // create tagfiles/supporting.access.txt
-        //supportingAccess = new File("tagfiles/supporting.access.txt");
-        //theBag.addFileAsTag(supportingAccess);
-
-
-        //}
-        //catch (IOException e) {
-
-        //    System.err.println("Caught IOException: " + e.getMessage());
-        //}
     }
 
     public void setManifestsAndTagfiles() throws IOException {
@@ -169,7 +148,7 @@ public class BagIt {
         adds a final file to our BagIt
      */
 
-    public void addFinalFile(File file, int sequence) throws IOException {
+    public void addFinalFile(File file, int sequence) {
 
         // check if we have a sequence
         if (sequence >= 0)
@@ -178,38 +157,31 @@ public class BagIt {
             finalSequenceCounter = sequence;
         }
 
-        // new file (according to our nomenclature
-        File finalFile = new File("final/" + file.getName());
-
-        // copy the file to where we need it
-        FileUtils.copyFile(file, finalFile);
-
-        // add the file into the final directory (and manifest-md5.txt)
-        theBag.addFileToPayload(finalFile.getParentFile());
-        // theBag.putBagFile(new FileBagFile("data/final", finalFile));
-
         // data final directory
-        String dataFinal = "data/final/";
+        String dataFinal = "data/final/" + file.getName();
+
+        // add the file
+        theBag.putBagFile(new FileBagFile(dataFinal, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n";
-        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + "\n";
 
         // add the file to the final.sequence.txt
-        finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n";
-        // FileUtils.writeStringToFile(finalSequence, finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n", true);
+        finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + file.getName() + "\n";
 
         // increment the sequence counter
         finalSequenceCounter++;
 
         // generate the checksum
-        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataFinal + finalFile.getName(), finalFile).newInputStream(), Manifest.Algorithm.MD5);
+        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataFinal, file).newInputStream(), Manifest.Algorithm.MD5);
 
         // add file to payload manifest
-        manifest.put(dataFinal + finalFile.getName(), checksum);
+        manifest.put(dataFinal, checksum);
+
+
     }
 
-    public void addFinalFile(File file) throws IOException {
+    public void addFinalFile(File file) {
 
         // if we don't have a sequence number
         addFinalFile(file, -1);
@@ -219,7 +191,7 @@ public class BagIt {
         adds a supporting file to our BagIt
      */
 
-    public void addSupportingFile(File file, int sequence, String access) throws IOException {
+    public void addSupportingFile(File file, int sequence, String access) {
 
         // check if we have a sequence
         if (sequence >= 0)
@@ -228,36 +200,37 @@ public class BagIt {
             supportingSequenceCounter = sequence;
         }
 
-        // new file (according to our nomenclature
-        File supportingFile = new File("supporting/" + file.getName());
-
-        // copy the file to where we need it
-        FileUtils.copyFile(file, supportingFile);
-
-        // add the file into the supporting directory
-        theBag.addFileToPayload(supportingFile.getParentFile());
-
         // data supporting directory
-        String dataSupporting = "data/supporting/";
+        String dataSupporting = "data/supporting/" + file.getName();
+
+        // add the file
+        theBag.putBagFile(new FileBagFile(dataSupporting, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n";
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + "\n";
         //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
-        supportingSequence = supportingSequence + supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n";
+        supportingSequence = supportingSequence + supportingSequenceCounter + "\t" + dataSupporting + "\n";
         //FileUtils.writeStringToFile(supportingSequence, supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n", true);
 
         // increment the sequence
         supportingSequenceCounter++;
 
         // add the file tagfiles/supporting.access.txt as access (open|closed)
-        supportingAccess = supportingAccess + access + "\t" + dataSupporting + supportingFile.getName() + "\n";
+        supportingAccess = supportingAccess + access + "\t" + dataSupporting + "\n";
         //FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
+
+        // generate the checksum
+        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataSupporting, file).newInputStream(), Manifest.Algorithm.MD5);
+
+        // add file to payload manifest
+        manifest.put(dataSupporting, checksum);
+
 
     }
 
-    public void addSupportingFile(File file, String access) throws IOException {
+    public void addSupportingFile(File file, String access) {
 
         // if we don't have a sequence number
         addSupportingFile(file, -1, access);
@@ -265,57 +238,46 @@ public class BagIt {
 
 
     /*
-        adds a tag file to our BagIt
-     */
-    public void addTagFile(File file) {
-
-        theBag.addFileAsTag(file);
-    }
-
-
-    /*
         add a metadata file in the metadata directory
      */
-    public void addMetadataFile(File file) throws IOException {
-
-        // new file (according to our nomenclature
-        File metadataFile = new File("metadata/" + file.getName());
-
-        // copy the file to where we need it
-        FileUtils.copyFile(file, metadataFile);
-
-        // add the file into the metadata directory
-        theBag.addFileToPayload(metadataFile.getParentFile());
+    public void addMetadataFile(File file) {
 
         // data metadata directory
-        String dataMetadata = "data/metadata/";
+        String dataMetadata = "data/metadata/" + file.getName();
+
+        // add the file
+        theBag.putBagFile(new FileBagFile(dataMetadata, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n";
-        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + "\n";
+
+        // generate the checksum
+        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataMetadata, file).newInputStream(), Manifest.Algorithm.MD5);
+
+        // add file to payload manifest
+        manifest.put(dataMetadata, checksum);
 
     }
 
     /*
         add a licence file in the licence directory
      */
-    public void addLicenceFile(File file) throws IOException {
+    public void addLicenceFile(File file) {
 
-        // new file (according to our nomenclature
-        File licenceFile = new File("licence/" + file.getName());
+        // data licence directory
+        String dataLicence = "data/licence/" + file.getName();
 
-        // copy the file to where we need it
-        FileUtils.copyFile(file, licenceFile);
-
-        // add the file into the licence directory
-        theBag.addFileToPayload(licenceFile.getParentFile());
-
-        // data metadata directory
-        String dataLicence = "data/licence/";
+        // add the file
+        theBag.putBagFile(new FileBagFile(dataLicence, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n";
-        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + "\n";
+
+        // generate the checksum
+        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataLicence, file).newInputStream(), Manifest.Algorithm.MD5);
+
+        // add file to payload manifest
+        manifest.put(dataLicence, checksum);
 
     }
 
@@ -323,7 +285,7 @@ public class BagIt {
         generates the manifests
      */
 
-    public void generateManifests() throws IOException {
+    public void generateManifests() {
 
         theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
         theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
@@ -334,12 +296,31 @@ public class BagIt {
 
     }
 
+    /*
+        generates the tag files
+     */
+    public void generateTagFiles() throws IOException {
+
+        // get our tagfile strings as input streams
+        InputStream formatsStream = new ByteArrayInputStream(formats.getBytes("UTF-8"));
+        InputStream finalStream = new ByteArrayInputStream(finalSequence.getBytes("UTF-8"));
+        InputStream supportingStream = new ByteArrayInputStream(supportingSequence.getBytes("UTF-8"));
+        InputStream accessStream = new ByteArrayInputStream(supportingAccess.getBytes("UTF-8"));
+
+        // WE STILL NEED TO ADD THESE TO THE BAG
+        // need to do this without having to write to disk.
+
+        // then need to add these tagfiles to the tagmanifest
+
+    }
+
+
 
     /*
         returns a hashmap of formats read from tagfiles/formats.txt
      */
 
-    public void setFormatMap() throws IOException {
+    public void setFormatMap() {
 
         // hash map of formats
         formatMap = new HashMap<String, String>();
@@ -363,7 +344,7 @@ public class BagIt {
        returns a hashmap of access rights read from tagfiles/supporting.access.txt
     */
 
-    public void setAccessMap() throws IOException {
+    public void setAccessMap() {
 
         // hash map of access rights
         accessMap = new HashMap<String, String>();
@@ -391,7 +372,7 @@ public class BagIt {
         R008 DSpace Item PRIMARY
      */
 
-    public TreeMap<Integer, BaggedItem> getSequencedPrimaries() throws IOException {
+    public TreeMap<Integer, BaggedItem> getSequencedPrimaries() {
 
         TreeMap<Integer, BaggedItem> sequencedPrimaries = new TreeMap<Integer, BaggedItem>();
 
@@ -432,7 +413,7 @@ public class BagIt {
     */
 
 
-    public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights) throws IOException {
+    public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights) {
 
         TreeMap<Integer, BaggedItem> sequencedSecondaries = new TreeMap<Integer, BaggedItem>();
 
@@ -473,8 +454,8 @@ public class BagIt {
       data/metadata/metadata.xml
     */
 
-    public BaggedItem getMetadata()
-    {
+    public BaggedItem getMetadata() {
+
         BaggedItem metadata = new BaggedItem();
         metadata.setInputStream(theBag.getBagFile("data/metadata/metadata.xml").newInputStream());
         metadata.setFilename("metadata.xml");
@@ -489,8 +470,8 @@ public class BagIt {
       data/licence/licence.txt
     */
 
-    public BaggedItem getLicence()
-    {
+    public BaggedItem getLicence() {
+
         BaggedItem licence = new BaggedItem();
         licence.setInputStream(theBag.getBagFile("data/licence/licence.txt").newInputStream());
         licence.setFilename("licence.txt");

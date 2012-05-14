@@ -51,10 +51,10 @@ Creating Bags
 A BagIt object can be created by passing it an existing bag using BagIt(File file) where the file could be the bag zip
 file or a bag directory (non-serialised). A BagIt object can be built up using the library as follows:
 
- Bag newBag = new BagIt();
+Bag newBag = new BagIt();
 
- and then adding all the final files using addFinalFile(File file, int sequence) and the supporting files using
- addSupportingFile(File file, int sequence, String access).
+and then adding all the final files using addFinalFile(File file, int sequence) and the supporting files using
+addSupportingFile(File file, int sequence, String access).
 
- Once all the files have been added, the manifests and tagfiles are then created with setManifestsAndTagfiles(). This
- completes the bag and creates all the necessary files.
+Once all the files have been added, the manifests and tagfiles are then created with setManifestsAndTagfiles(). This
+completes the bag and creates all the necessary files.

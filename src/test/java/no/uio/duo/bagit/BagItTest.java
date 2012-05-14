@@ -46,10 +46,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.*;
 
 public class BagItTest {
 
@@ -86,7 +83,7 @@ public class BagItTest {
     /*
         create empty bag
      */
-/*
+
     @Test
     public void testBagConstructorEmptyBag() throws Exception {
 
@@ -128,6 +125,9 @@ public class BagItTest {
             // we still don't have a valid bag... create our manifest
             assertFalse(bag.verifyValid().isSuccess());
 
+            // now generate our tagfiles
+            testBagIt.generateTagFiles();
+
             // now generate our manifest
             testBagIt.generateManifests();
 
@@ -141,7 +141,6 @@ public class BagItTest {
         }
 
     }
-*/
     /*
         create a bag and get primaries
      */
