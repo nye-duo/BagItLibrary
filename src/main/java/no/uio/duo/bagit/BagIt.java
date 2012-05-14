@@ -172,9 +172,9 @@ public class BagIt {
     public void addFinalFile(File file, int sequence) throws IOException {
 
         // check if we have a sequence
-        if (sequence > 0)
+        if (sequence >= 0)
         {
-            // set out sequence counter to the right value
+            // set our sequence counter to the right value
             finalSequenceCounter = sequence;
         }
 
@@ -222,7 +222,7 @@ public class BagIt {
     public void addSupportingFile(File file, int sequence, String access) throws IOException {
 
         // check if we have a sequence
-        if (sequence > 0)
+        if (sequence >= 0)
         {
             // set out sequence counter to the right value
             supportingSequenceCounter = sequence;
