@@ -32,6 +32,7 @@ import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.FileBagFile;
 import gov.loc.repository.bagit.utilities.MessageDigestHelper;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -47,10 +48,10 @@ public class BagIt {
     Manifest manifest;
     Manifest tagmanifest;
 
-    File formats;
-    File finalSequence;
-    File supportingSequence;
-    File supportingAccess;
+    String formats = "";
+    String finalSequence = "";
+    String supportingSequence = "";
+    String supportingAccess = "";
 
     HashMap<String, String> formatMap;
     HashMap<String, String> accessMap;
@@ -110,36 +111,27 @@ public class BagIt {
         tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
 
         // create the tagfiles
-        try {
+        //formats = new File("tagfiles/formats.txt");
+        //theBag.addFileAsTag(formats);
 
-            //create tagfiles directory
+        // create tagfiles/final.sequence.txt
+        //finalSequence = new File("tagfiles/final.sequence.txt");
+        //theBag.addFileAsTag(finalSequence);
 
-            // create tagfiles/formats.txt
-            formats = new File("formats.txt");
-            FileUtils.touch(formats);
-            theBag.addFileAsTag(formats);
+        // create tagfiles/supporting.sequence.txt
+        //supportingSequence = new File("tagfiles/supporting.sequence.txt");
+        //theBag.addFileAsTag(supportingSequence);
 
-            // create tagfiles/final.sequence.txt
-            finalSequence = new File("final.sequence.txt");
-            FileUtils.touch(finalSequence);
-            theBag.addFileAsTag(finalSequence);
-
-            // create tagfiles/supporting.sequence.txt
-            supportingSequence = new File("supporting.sequence.txt");
-            FileUtils.touch(supportingSequence);
-            theBag.addFileAsTag(supportingSequence);
-
-            // create tagfiles/supporting.access.txt
-            supportingAccess = new File("supporting.access.txt");
-            FileUtils.touch(supportingAccess);
-            theBag.addFileAsTag(supportingAccess);
+        // create tagfiles/supporting.access.txt
+        //supportingAccess = new File("tagfiles/supporting.access.txt");
+        //theBag.addFileAsTag(supportingAccess);
 
 
-        }
-        catch (IOException e) {
+        //}
+        //catch (IOException e) {
 
-            System.err.println("Caught IOException: " + e.getMessage());
-        }
+        //    System.err.println("Caught IOException: " + e.getMessage());
+        //}
     }
 
     public void setManifestsAndTagfiles() throws IOException {
@@ -147,17 +139,25 @@ public class BagIt {
         manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
         tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
 
-        formats = new File("formats.txt");
-        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/formats.txt").newInputStream(), formats);
+        // get the formats
+        StringWriter formatWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/formats.txt").newInputStream(), formatWriter, "UTF-8");
+        formats = formatWriter.toString();
 
-        finalSequence = new File("final.sequence.txt");
-        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/final.sequence.txt").newInputStream(), finalSequence);
+        // get the final sequence
+        StringWriter finalWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/final.sequence.txt").newInputStream(), finalWriter, "UTF-8");
+        finalSequence = finalWriter.toString();
 
-        supportingSequence = new File("supporting.sequence.txt");
-        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/supporting.sequence.txt").newInputStream(), supportingSequence);
+        // get the supporting sequence
+        StringWriter supportingWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.sequence.txt").newInputStream(), supportingWriter, "UTF-8");
+        supportingSequence = supportingWriter.toString();
 
-        supportingAccess = new File("supporting.access.txt");
-        FileUtils.copyInputStreamToFile(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), supportingAccess);
+        // get the supporting access
+        StringWriter accessWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), accessWriter, "UTF-8");
+        supportingAccess = accessWriter.toString();
 
         setFormatMap();
 
@@ -192,10 +192,12 @@ public class BagIt {
         String dataFinal = "data/final/";
 
         // add the format to tagfiles/formats.txt
-        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n";
+        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + finalFile.getName() + "\n", true);
 
         // add the file to the final.sequence.txt
-        FileUtils.writeStringToFile(finalSequence, finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n", true);
+        finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n";
+        // FileUtils.writeStringToFile(finalSequence, finalSequenceCounter + "\t" + dataFinal + finalFile.getName() + "\n", true);
 
         // increment the sequence counter
         finalSequenceCounter++;
@@ -239,16 +241,19 @@ public class BagIt {
         String dataSupporting = "data/supporting/";
 
         // add the format to tagfiles/formats.txt
-        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n";
+        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
-        FileUtils.writeStringToFile(supportingSequence, supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n", true);
+        supportingSequence = supportingSequence + supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n";
+        //FileUtils.writeStringToFile(supportingSequence, supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n", true);
 
         // increment the sequence
         supportingSequenceCounter++;
 
         // add the file tagfiles/supporting.access.txt as access (open|closed)
-        FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
+        supportingAccess = supportingAccess + access + "\t" + dataSupporting + supportingFile.getName() + "\n";
+        //FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
     }
 
@@ -286,7 +291,8 @@ public class BagIt {
         String dataMetadata = "data/metadata/";
 
         // add the format to tagfiles/formats.txt
-        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n";
+        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + metadataFile.getName() + "\n", true);
 
     }
 
@@ -308,7 +314,8 @@ public class BagIt {
         String dataLicence = "data/licence/";
 
         // add the format to tagfiles/formats.txt
-        FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n", true);
+        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n";
+        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + licenceFile.getName() + "\n", true);
 
     }
 
@@ -337,38 +344,17 @@ public class BagIt {
         // hash map of formats
         formatMap = new HashMap<String, String>();
 
-        // bag file of formats
-        BagFile bagFormats = theBag.getBagFile("tagfiles/formats.txt");
+        // split our formats string
+        String[] theFormats = formats.split("\n");
 
-        // create the file for the formats
-        File bagFormatsFile = new File("formats.txt");
+        // for each line
+        for(String line : theFormats) {
 
-        // copy the contents from the bag file to the file
-        FileUtils.copyInputStreamToFile(bagFormats.newInputStream(), bagFormatsFile);
+            // split it  up
+            String[] words = line.split("\\s");
 
-        // create the line iterator
-        LineIterator iterator = FileUtils.lineIterator(bagFormatsFile, "UTF-8");
-
-        try {
-
-            // for each line in the file
-            while (iterator.hasNext()) {
-
-                // get the line
-                String line = iterator.nextLine();
-
-                // split it  up
-                String[] words = line.split("\\s+");
-
-                // store it in the formatMap
-                formatMap.put(words[1], words[0]);
-            }
-        }
-
-        finally {
-
-            // close the line iterator
-            LineIterator.closeQuietly(iterator);
+            // store it in the formatMap
+            formatMap.put(words[1], words[0]);
         }
 
     }
@@ -382,38 +368,17 @@ public class BagIt {
         // hash map of access rights
         accessMap = new HashMap<String, String>();
 
-        // bag file of access rights
-        BagFile bagAccessRights = theBag.getBagFile("tagfiles/supporting.access.txt");
+        // split our access rights string
+        String[] theRights = supportingAccess.split("\n");
 
-        // create the file for the formats
-        File bagAccessFile = new File("supporting.access.txt");
+        // for each line
+        for(String line : theRights) {
 
-        // copy the contents from the bag file to the file
-        FileUtils.copyInputStreamToFile(bagAccessRights.newInputStream(), bagAccessFile);
+            // split it  up
+            String[] words = line.split("\\s");
 
-        // create the line iterator
-        LineIterator iterator = FileUtils.lineIterator(bagAccessFile, "UTF-8");
-
-        try {
-
-            // for each line in the file
-            while (iterator.hasNext()) {
-
-                // get the line
-                String line = iterator.nextLine();
-
-                // split it  up
-                String[] words = line.split("\\s+");
-
-                // store it in the formatMap
-                accessMap.put(words[1], words[0]);
-            }
-        }
-
-        finally {
-
-            // close the line iterator
-            LineIterator.closeQuietly(iterator);
+            // store it in the formatMap
+            accessMap.put(words[1], words[0]);
         }
 
     }
@@ -428,49 +393,32 @@ public class BagIt {
 
     public TreeMap<Integer, BaggedItem> getSequencedPrimaries() throws IOException {
 
-        // look through tagfiles/final.sequence.txt
-        BagFile bagFinalSequence = theBag.getBagFile("tagfiles/final.sequence.txt");
-
-        // create the file
-        File bagFinalFile = new File("final.sequence.txt");
-
-        // copy the file
-        FileUtils.copyInputStreamToFile(bagFinalSequence.newInputStream(), bagFinalFile);
-
-        // get each BagFile in sequence and put it in a BaggedItem
-
-        // read through the file, line by line
-        LineIterator it = FileUtils.lineIterator(bagFinalFile, "UTF-8");
-
         TreeMap<Integer, BaggedItem> sequencedPrimaries = new TreeMap<Integer, BaggedItem>();
 
-        try {
-            while (it.hasNext()) {
+        // split our access rights string
+        String[] theFinalSequence = finalSequence.split("\n");
 
-                // get the line
-                String line = it.nextLine();
+        // for each line
+        for(String line : theFinalSequence) {
 
-                // split it  up
-                String[] words = line.split("\\s+");
+            // split it  up
+            String[] words = line.split("\\s");
 
-                String[] path = words[1].split("/");
+            // get the path
+            String[] path = words[1].split("/");
 
-                // the bagged item
-                BaggedItem baggedItem = new BaggedItem();
+            // the bagged item
+            BaggedItem baggedItem = new BaggedItem();
 
-                baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
-                baggedItem.setFilename(path[path.length - 1]);
-                baggedItem.setFormat(formatMap.get(words[1]));
-                baggedItem.setSequence(Integer.parseInt(words[0]));
+            baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
+            baggedItem.setFilename(path[path.length - 1]);
+            baggedItem.setFormat(formatMap.get(words[1]));
+            baggedItem.setSequence(Integer.parseInt(words[0]));
 
-                // create the node
-                sequencedPrimaries.put(Integer.parseInt(words[0]), baggedItem);
-
-            }
-        } finally {
-            LineIterator.closeQuietly(it);
+            // create the node
+            sequencedPrimaries.put(Integer.parseInt(words[0]), baggedItem);
         }
-        // add it to our tree
+
 
         return sequencedPrimaries;
     }
@@ -486,57 +434,35 @@ public class BagIt {
 
     public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights) throws IOException {
 
-        // look through tagfiles/supporting.sequence.txt
-        BagFile bagSupportingSequence = theBag.getBagFile("tagfiles/supporting.sequence.txt");
-
-        // create the file
-        File bagSupportingFile = new File("supporting.sequence.txt");
-
-        // copy the file
-        FileUtils.copyInputStreamToFile(bagSupportingSequence.newInputStream(), bagSupportingFile);
-
-        // get each BagFile in sequence and put it in a BaggedItem
-
-        // read through the file, line by line
-        LineIterator it = FileUtils.lineIterator(bagSupportingFile, "UTF-8");
-
         TreeMap<Integer, BaggedItem> sequencedSecondaries = new TreeMap<Integer, BaggedItem>();
 
-        try {
-            while (it.hasNext()) {
+        // split our access rights string
+        String[] theSupportingSequence = supportingSequence.split("\n");
 
-                // get the line
-                String line = it.nextLine();
+        // for each line
+        for(String line : theSupportingSequence) {
 
-                // split it  up
-                String[] words = line.split("\\s+");
+            // split it  up
+            String[] words = line.split("\\s+");
 
-                // only if the access rights match
-                if (accessRights.equals(accessMap.get(words[1]))) {
+            // only if the access rights match
+            if (accessRights.equals(accessMap.get(words[1]))) {
 
-                    String[] path = words[1].split("/");
+                String[] path = words[1].split("/");
 
-                    // the bagged item
-                    BaggedItem baggedItem = new BaggedItem();
+                // the bagged item
+                BaggedItem baggedItem = new BaggedItem();
 
-                    baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
-                    baggedItem.setFilename(path[path.length - 1]);
-                    baggedItem.setFormat(formatMap.get(words[1]));
-                    baggedItem.setSequence(Integer.parseInt(words[0]));
+                baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
+                baggedItem.setFilename(path[path.length - 1]);
+                baggedItem.setFormat(formatMap.get(words[1]));
+                baggedItem.setSequence(Integer.parseInt(words[0]));
 
-                    // create the node
-                    sequencedSecondaries.put(Integer.parseInt(words[0]), baggedItem);
-
-                }
+                // create the node
+                sequencedSecondaries.put(Integer.parseInt(words[0]), baggedItem);
 
             }
-
         }
-        finally {
-
-            LineIterator.closeQuietly(it);
-        }
-        // add it to our tree
 
         return sequencedSecondaries;
     }
