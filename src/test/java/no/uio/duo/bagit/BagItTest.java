@@ -199,6 +199,7 @@ public class BagItTest {
     /*
        create a bag from a zip and check values
     */
+    /*
     @Test
     public void testBagZip() throws Exception {
 
@@ -218,5 +219,5 @@ public class BagItTest {
             bag.close();
         }
 
-    }
+    }*/
 }

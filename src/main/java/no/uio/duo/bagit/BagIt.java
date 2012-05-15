@@ -30,8 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.FileBagFile;
+import gov.loc.repository.bagit.impl.StringBagFile;
 import gov.loc.repository.bagit.transfer.FetchedFileDestinationFactory;
 import gov.loc.repository.bagit.utilities.MessageDigestHelper;
+import gov.loc.repository.bagit.writer.impl.ZipWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -85,16 +87,13 @@ public class BagIt {
     */
     public BagIt(String filePath) throws IOException {
 
-        theBag = bagFactory.createBag(new File(filePath));
-
-        setManifestsAndTagfiles();
+        this(new File(filePath));
 
     }
 
     public BagIt(File file) throws IOException {
 
         theBag = bagFactory.createBag(file);
-
         setManifestsAndTagfiles();
 
     }
@@ -103,14 +102,12 @@ public class BagIt {
         creates an empty BagIt according to our BagIt structure
      */
     public BagIt() {
-
         // create the bag
         theBag = bagFactory.createBag(BagFactory.Version.V0_97);
 
         // create our manifests
         manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
         tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
-
     }
 
     public void setManifestsAndTagfiles() throws IOException {
@@ -144,6 +141,39 @@ public class BagIt {
 
     }
 
+    public void writeBag(File zipFile)
+    {
+        // write all of our tagfiles
+        StringBagFile formatBagFile = new StringBagFile("tagfiles/formats.txt", formats.getBytes());
+        this.theBag.putBagFile(formatBagFile);
+        String checksum = MessageDigestHelper.generateFixity(formatBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/formats.txt", checksum);
+
+        StringBagFile finalSeqBagFile = new StringBagFile("tagfiles/final.sequence.txt", finalSequence.getBytes());
+        this.theBag.putBagFile(finalSeqBagFile);
+        checksum = MessageDigestHelper.generateFixity(finalSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/final.sequence.txt", checksum);
+
+        StringBagFile supportingAccessBagFile = new StringBagFile("tagfiles/supporting.access.txt", supportingAccess.getBytes());
+        this.theBag.putBagFile(supportingAccessBagFile);
+        checksum = MessageDigestHelper.generateFixity(supportingAccessBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/supporting.access.txt", checksum);
+
+        StringBagFile supportingSeqBagFile = new StringBagFile("tagfiles/supporting.sequence.txt", supportingSequence.getBytes());
+        this.theBag.putBagFile(supportingSeqBagFile);
+        checksum = MessageDigestHelper.generateFixity(supportingSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/supporting.sequence.txt", checksum);
+
+        // write all the root directory stuff
+        theBag.putBagFile(manifest);
+        theBag.putBagFile(tagmanifest);
+
+        BagItTxt bagItTxt = theBag.getBagPartFactory().createBagItTxt();
+        theBag.putBagFile(bagItTxt);
+
+        this.theBag.write(new ZipWriter(bagFactory), zipFile);
+    }
+
     /*
         adds a final file to our BagIt
      */
@@ -167,7 +197,7 @@ public class BagIt {
         formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + "\n";
 
         // add the file to the final.sequence.txt
-        finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + file.getName() + "\n";
+        finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + "\n";
 
         // increment the sequence counter
         finalSequenceCounter++;
