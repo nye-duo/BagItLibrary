@@ -64,7 +64,7 @@ public class BagItTest {
 
             assertTrue(bag.verifyValid().isSuccess());
             assertEquals(4, bag.getPayload().size());
-            assertEquals(8, bag.getTags().size());
+            assertEquals(7, bag.getTags().size());
             assertEquals(1, bag.getPayloadManifests().size());
             assertEquals(1, bag.getTagManifests().size());
             BagItTxt bagIt = bag.getBagItTxt();
