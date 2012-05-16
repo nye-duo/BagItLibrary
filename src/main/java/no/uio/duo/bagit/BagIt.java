@@ -271,26 +271,36 @@ public class BagIt {
     }
 
 
+    public void addMetadata(Metadata metadata)
+    {
+        String mdxml = metadata.toXML();
+        StringBagFile sbf = new StringBagFile("data/metadata/metadata.xml", mdxml.getBytes());
+        this.addMetadataBagFile(sbf);
+    }
+
     /*
         add a metadata file in the metadata directory
      */
-    public void addMetadataFile(File file) {
+    public void addMetadataFile(File file)
+    {
+        String dataMetadata = "data/metadata/metadata.xml";
+        FileBagFile fbf = new FileBagFile(dataMetadata, file);
+        this.addMetadataBagFile(fbf);
+    }
 
-        // data metadata directory
-        String dataMetadata = "data/metadata/" + file.getName();
-
+    private void addMetadataBagFile(BagFile metadataBagFile)
+    {
         // add the file
-        theBag.putBagFile(new FileBagFile(dataMetadata, file));
+        theBag.putBagFile(metadataBagFile);
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataMetadata + "\n";
+        formats = formats + "text/xml\t" + metadataBagFile.getFilepath() + "\n";
 
         // generate the checksum
-        String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataMetadata, file).newInputStream(), Manifest.Algorithm.MD5);
+        String checksum = MessageDigestHelper.generateFixity(metadataBagFile.newInputStream(), Manifest.Algorithm.MD5);
 
         // add file to payload manifest
-        manifest.put(dataMetadata, checksum);
-
+        manifest.put(metadataBagFile.getFilepath(), checksum);
     }
 
     /*
