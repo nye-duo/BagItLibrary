@@ -63,6 +63,9 @@ import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Metadata
 {
     private static String FS_NAMESPACE = "http://studentweb.no/terms/";
@@ -135,6 +138,14 @@ public class Metadata
 
         subject.appendChild(subjectCode);
         subject.appendChild(subjectTitle);
+    }
+
+    public void setEmbargo(String type, Date date)
+    {
+        this.addField(Metadata.EMBARGO_TYPE, type);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String end = sdf.format(date);
+        this.addField(Metadata.EMBARGO_END_DATE, end);
     }
 
     public String toXML()

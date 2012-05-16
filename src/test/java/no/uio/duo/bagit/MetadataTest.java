@@ -61,6 +61,8 @@ package no.uio.duo.bagit;
 
 import org.junit.Test;
 
+import java.util.Date;
+
 public class MetadataTest
 {
     @Test
@@ -89,8 +91,7 @@ public class MetadataTest
                 "        they constructed a pae-pae raft from balsa wood and other native materials, a raft that\n" +
                 "        they called the Kon-Tiki.");
         metadata.addField(Metadata.TYPE, "Master's thesis");
-        metadata.addField(Metadata.EMBARGO_TYPE, "5 years");
-        metadata.addField(Metadata.EMBARGO_END_DATE, "01-01-2015");
+        metadata.setEmbargo("5 years", new Date((new Date()).getTime() + 100000000000L)); // some random time in the future
         metadata.addField(Metadata.GRADE, "pass");
 
         System.out.println(metadata.toXML());

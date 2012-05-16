@@ -42,13 +42,11 @@
 
     <dcterms:type>Master's thesis</dcterms:type>
 
-    <!-- FIXME: disabled embargo for the time being, due to bug in DSpace -->
-
     <!-- Type of embargo: 'Open', 'Closed', 'Not electronically available', '5 years', 'Other'-->
-    <!-- <fs:embargoType>5 years</fs:embargoType> -->
+    <fs:embargoType>5 years</fs:embargoType>
 
     <!-- Date on which embargo is lifted - 31-12-9999 means "never" -->
-    <!-- <fs:embargoEndDate>01-01-2015</fs:embargoEndDate> -->
+    <fs:embargoEndDate>2015-01-01</fs:embargoEndDate>
 
     <!-- Grade (if available) -->
     <fs:grade>pass</fs:grade>
