@@ -31,7 +31,7 @@ public class ScratchPad
 
         String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag.zip";
 
-        BagIt bi = new BagIt();
+        BagIt bi = new BagIt(new File(out));
 
         bi.addFinalFile(new File(firstFinal), 1);
         bi.addFinalFile(new File(secondFinal), 2);
@@ -48,6 +48,6 @@ public class ScratchPad
         bi.addMetadataFile(new File(metadata));
         bi.addLicenceFile(new File(licence));
 
-        bi.writeBag(new File(out));
+        bi.writeToFile();
     }
 }

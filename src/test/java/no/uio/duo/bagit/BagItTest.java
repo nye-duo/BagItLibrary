@@ -84,6 +84,7 @@ public class BagItTest {
         create empty bag
      */
 
+    /*
     @Test
     public void testBagConstructorEmptyBag() throws Exception {
 
@@ -141,6 +142,8 @@ public class BagItTest {
         }
 
     }
+    */
+
     /*
         create a bag and get primaries
      */

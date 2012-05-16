@@ -62,6 +62,8 @@ public class BagIt {
     int finalSequenceCounter = 1;
     int supportingSequenceCounter = 1;
 
+    File bagFile = null;
+
     /*
         creates a BagIt from an existing directory organised in the correct
         format
@@ -85,29 +87,31 @@ public class BagIt {
             |   final.sequence.txt
             |   supporting.sequence.txt
     */
-    public BagIt(String filePath) throws IOException {
-
+    public BagIt(String filePath)
+            throws IOException
+    {
         this(new File(filePath));
-
     }
 
-    public BagIt(File file) throws IOException {
+    public BagIt(File file)
+            throws IOException
+    {
+        this.bagFile = file;
+        if (file.exists())
+        {
+            // load the bag
+            theBag = bagFactory.createBag(file);
+            setManifestsAndTagfiles();
+        }
+        else
+        {
+            // create the bag
+            theBag = bagFactory.createBag(BagFactory.Version.V0_97);
 
-        theBag = bagFactory.createBag(file);
-        setManifestsAndTagfiles();
-
-    }
-
-    /*
-        creates an empty BagIt according to our BagIt structure
-     */
-    public BagIt() {
-        // create the bag
-        theBag = bagFactory.createBag(BagFactory.Version.V0_97);
-
-        // create our manifests
-        manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
-        tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
+            // create our manifests
+            manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
+            tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
+        }
     }
 
     public void setManifestsAndTagfiles() throws IOException {
@@ -141,7 +145,7 @@ public class BagIt {
 
     }
 
-    public void writeBag(File zipFile)
+    public void writeToFile()
     {
         // write all of our tagfiles
         StringBagFile formatBagFile = new StringBagFile("tagfiles/formats.txt", formats.getBytes());
@@ -171,7 +175,7 @@ public class BagIt {
         BagItTxt bagItTxt = theBag.getBagPartFactory().createBagItTxt();
         theBag.putBagFile(bagItTxt);
 
-        this.theBag.write(new ZipWriter(bagFactory), zipFile);
+        this.theBag.write(new ZipWriter(bagFactory), this.bagFile);
     }
 
     /*
@@ -545,7 +549,7 @@ public class BagIt {
      */
     public InputStream getFile() throws IOException {
 
-        return FileUtils.openInputStream(theBag.getFile());
+        return FileUtils.openInputStream(this.bagFile);
     }
 
     /*
@@ -553,7 +557,7 @@ public class BagIt {
      */
     public String getName() {
 
-        return theBag.getFile().getName();
+        return this.bagFile.getName();
     }
 
     /*
@@ -561,7 +565,7 @@ public class BagIt {
      */
     public String getMD5() {
 
-        return (MessageDigestHelper.generateFixity(theBag.getFile(), Manifest.Algorithm.MD5));
+        return (MessageDigestHelper.generateFixity(this.bagFile, Manifest.Algorithm.MD5));
     }
 
     /*
@@ -570,12 +574,7 @@ public class BagIt {
 
     public String getMimetype() {
 
-        if (theBag.getFormat().scheme.equals("zip")) {
-            return "application/zip";
-        }
-        else {
-            return new MimetypesFileTypeMap().getContentType(theBag.getFile());
-        }
+        return "application/zip";
     }
 
     /*
@@ -584,7 +583,7 @@ public class BagIt {
 
     public String getPackaging() {
 
-        return theBag.getFormat().scheme;
+        return "http://duo.uio.no/terms/package/FSBagIt";
     }
 
 
