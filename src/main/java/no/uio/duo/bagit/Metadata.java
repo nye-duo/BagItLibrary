@@ -62,9 +62,12 @@ package no.uio.duo.bagit;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
+import nu.xom.Elements;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Metadata
 {
@@ -95,12 +98,19 @@ public class Metadata
     public static String ABSTRACT = "dcterms:abstract";
     public static String TYPE = "dcterms:type";
 
+    public static String ANY_LANGUAGE = "*";
+
     private Element metadata = null;
 
     public Metadata()
     {
         this.metadata = new Element("fs:metadata", FS_NAMESPACE);
         this.metadata.addNamespaceDeclaration("dcterms", DC_NAMESPACE);
+    }
+
+    public Metadata(Element metadata)
+    {
+        this.metadata = metadata;
     }
 
     public void addField(String fieldName, String value)
@@ -123,12 +133,7 @@ public class Metadata
 
     public void addSubject(String code, String title)
     {
-        Element subject = this.metadata.getFirstChildElement(SUBJECT, FS_NAMESPACE);
-        if (subject == null)
-        {
-            subject = new Element(SUBJECT, FS_NAMESPACE);
-            this.metadata.appendChild(subject);
-        }
+        Element subject = new Element(SUBJECT, FS_NAMESPACE);
 
         Element subjectCode = new Element(SUBJECT_CODE, FS_NAMESPACE);
         subjectCode.appendChild(code);
@@ -138,6 +143,8 @@ public class Metadata
 
         subject.appendChild(subjectCode);
         subject.appendChild(subjectTitle);
+
+        this.metadata.appendChild(subject);
     }
 
     public void setEmbargo(String type, Date date)
@@ -148,9 +155,77 @@ public class Metadata
         this.addField(Metadata.EMBARGO_END_DATE, end);
     }
 
+    public List<String> getField(String fieldName)
+    {
+        return this.getField(fieldName, ANY_LANGUAGE);
+    }
+
+    public List<String> getField(String fieldName, String language)
+    {
+        String[] parts = this.interpretField(fieldName);
+        List<String> values = new ArrayList<String>();
+        Elements elements = this.metadata.getChildElements(parts[0], parts[1]);
+        for (int i = 0; i < elements.size(); i++)
+        {
+            Element element = elements.get(i);
+            Attribute lang = element.getAttribute("lang", XML_NAMESPACE);
+
+            if (    (language == null || ANY_LANGUAGE.equals(language)) || // if the language argument is null or set to * OR
+                    (language != null && !ANY_LANGUAGE.equals(language) && lang != null && language.equals(lang.getValue())) // if the language value is set and is equal to the xml:lang attribute (if it is not null)
+               )
+            {
+                values.add(element.getValue());
+            }
+        }
+        return values;
+    }
+
+    public List<String[]> getSubjects()
+    {
+        List<String[]> subjects = new ArrayList<String[]>();
+        String[] parts = this.interpretField(SUBJECT);
+        Elements elements = this.metadata.getChildElements(parts[0], parts[1]);
+        for (int i = 0; i < elements.size(); i++)
+        {
+            Element element = elements.get(i);
+            String[] codeParts = this.interpretField(SUBJECT_CODE);
+            Element codeElement = element.getFirstChildElement(codeParts[0], codeParts[1]);
+            String[] titleParts = this.interpretField(SUBJECT_TITLE);
+            Element titleElement = element.getFirstChildElement(titleParts[0], titleParts[1]);
+            String[] pair = { codeElement.getValue(), titleElement.getValue() };
+            subjects.add(pair);
+        }
+        return subjects;
+    }
+
     public String toXML()
     {
         Document doc = new Document(this.metadata);
         return doc.toXML();
+    }
+
+    public Element getElement()
+    {
+        return this.metadata;
+    }
+
+    private String[] interpretField(String fieldName)
+    {
+        String[] bits = fieldName.split(":");
+        if (bits.length == 1)
+        {
+            String[] ret = { bits[0], null };
+            return ret;
+        }
+        else if (bits.length == 2)
+        {
+            String namespace = bits[0].startsWith("fs") ? FS_NAMESPACE : DC_NAMESPACE;
+            String[] ret = {bits[1], namespace};
+            return ret;
+        }
+        else
+        {
+            return null;
+        }
     }
 }
