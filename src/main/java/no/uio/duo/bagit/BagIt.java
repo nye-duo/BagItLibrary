@@ -31,12 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import gov.loc.repository.bagit.*;
 import gov.loc.repository.bagit.impl.FileBagFile;
 import gov.loc.repository.bagit.impl.StringBagFile;
-import gov.loc.repository.bagit.transfer.FetchedFileDestinationFactory;
 import gov.loc.repository.bagit.utilities.MessageDigestHelper;
 import gov.loc.repository.bagit.writer.impl.ZipWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.LineIterator;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
@@ -112,70 +110,6 @@ public class BagIt {
             manifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getPayloadManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
             tagmanifest = theBag.getBagPartFactory().createManifest(ManifestHelper.getTagManifestFilename(Manifest.Algorithm.MD5, theBag.getBagConstants()));
         }
-    }
-
-    public void setManifestsAndTagfiles() throws IOException {
-
-        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
-        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
-
-        // get the formats
-        StringWriter formatWriter = new StringWriter();
-        IOUtils.copy(theBag.getBagFile("tagfiles/formats.txt").newInputStream(), formatWriter, "UTF-8");
-        formats = formatWriter.toString();
-
-        // get the final sequence
-        StringWriter finalWriter = new StringWriter();
-        IOUtils.copy(theBag.getBagFile("tagfiles/final.sequence.txt").newInputStream(), finalWriter, "UTF-8");
-        finalSequence = finalWriter.toString();
-
-        // get the supporting sequence
-        StringWriter supportingWriter = new StringWriter();
-        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.sequence.txt").newInputStream(), supportingWriter, "UTF-8");
-        supportingSequence = supportingWriter.toString();
-
-        // get the supporting access
-        StringWriter accessWriter = new StringWriter();
-        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), accessWriter, "UTF-8");
-        supportingAccess = accessWriter.toString();
-
-        setFormatMap();
-
-        setAccessMap();
-
-    }
-
-    public void writeToFile()
-    {
-        // write all of our tagfiles
-        StringBagFile formatBagFile = new StringBagFile("tagfiles/formats.txt", formats.getBytes());
-        this.theBag.putBagFile(formatBagFile);
-        String checksum = MessageDigestHelper.generateFixity(formatBagFile.newInputStream(), Manifest.Algorithm.MD5);
-        tagmanifest.put("tagfiles/formats.txt", checksum);
-
-        StringBagFile finalSeqBagFile = new StringBagFile("tagfiles/final.sequence.txt", finalSequence.getBytes());
-        this.theBag.putBagFile(finalSeqBagFile);
-        checksum = MessageDigestHelper.generateFixity(finalSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
-        tagmanifest.put("tagfiles/final.sequence.txt", checksum);
-
-        StringBagFile supportingAccessBagFile = new StringBagFile("tagfiles/supporting.access.txt", supportingAccess.getBytes());
-        this.theBag.putBagFile(supportingAccessBagFile);
-        checksum = MessageDigestHelper.generateFixity(supportingAccessBagFile.newInputStream(), Manifest.Algorithm.MD5);
-        tagmanifest.put("tagfiles/supporting.access.txt", checksum);
-
-        StringBagFile supportingSeqBagFile = new StringBagFile("tagfiles/supporting.sequence.txt", supportingSequence.getBytes());
-        this.theBag.putBagFile(supportingSeqBagFile);
-        checksum = MessageDigestHelper.generateFixity(supportingSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
-        tagmanifest.put("tagfiles/supporting.sequence.txt", checksum);
-
-        // write all the root directory stuff
-        theBag.putBagFile(manifest);
-        theBag.putBagFile(tagmanifest);
-
-        BagItTxt bagItTxt = theBag.getBagPartFactory().createBagItTxt();
-        theBag.putBagFile(bagItTxt);
-
-        this.theBag.write(new ZipWriter(bagFactory), this.bagFile);
     }
 
     /*
@@ -288,21 +222,6 @@ public class BagIt {
         this.addMetadataBagFile(fbf);
     }
 
-    private void addMetadataBagFile(BagFile metadataBagFile)
-    {
-        // add the file
-        theBag.putBagFile(metadataBagFile);
-
-        // add the format to tagfiles/formats.txt
-        formats = formats + "text/xml\t" + metadataBagFile.getFilepath() + "\n";
-
-        // generate the checksum
-        String checksum = MessageDigestHelper.generateFixity(metadataBagFile.newInputStream(), Manifest.Algorithm.MD5);
-
-        // add file to payload manifest
-        manifest.put(metadataBagFile.getFilepath(), checksum);
-    }
-
     /*
         add a licence file in the licence directory
      */
@@ -325,10 +244,45 @@ public class BagIt {
 
     }
 
+    public void writeToFile()
+    {
+        // write all of our tagfiles
+        StringBagFile formatBagFile = new StringBagFile("tagfiles/formats.txt", formats.getBytes());
+        this.theBag.putBagFile(formatBagFile);
+        String checksum = MessageDigestHelper.generateFixity(formatBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/formats.txt", checksum);
+
+        StringBagFile finalSeqBagFile = new StringBagFile("tagfiles/final.sequence.txt", finalSequence.getBytes());
+        this.theBag.putBagFile(finalSeqBagFile);
+        checksum = MessageDigestHelper.generateFixity(finalSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/final.sequence.txt", checksum);
+
+        StringBagFile supportingAccessBagFile = new StringBagFile("tagfiles/supporting.access.txt", supportingAccess.getBytes());
+        this.theBag.putBagFile(supportingAccessBagFile);
+        checksum = MessageDigestHelper.generateFixity(supportingAccessBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/supporting.access.txt", checksum);
+
+        StringBagFile supportingSeqBagFile = new StringBagFile("tagfiles/supporting.sequence.txt", supportingSequence.getBytes());
+        this.theBag.putBagFile(supportingSeqBagFile);
+        checksum = MessageDigestHelper.generateFixity(supportingSeqBagFile.newInputStream(), Manifest.Algorithm.MD5);
+        tagmanifest.put("tagfiles/supporting.sequence.txt", checksum);
+
+        // write all the root directory stuff
+        theBag.putBagFile(manifest);
+        theBag.putBagFile(tagmanifest);
+
+        BagItTxt bagItTxt = theBag.getBagPartFactory().createBagItTxt();
+        theBag.putBagFile(bagItTxt);
+
+        this.theBag.write(new ZipWriter(bagFactory), this.bagFile);
+    }
+
     /*
         generates the manifests
      */
 
+    /* FIXME: this isn't used, but not deleting it right now, as not sure if it might have some utility
+        later
     public void generateManifests() {
 
         theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
@@ -337,76 +291,8 @@ public class BagIt {
         theBag.putBagFile(manifest);
         theBag.putBagFile(tagmanifest);
         theBag.makeComplete();
-
     }
-
-    /*
-        generates the tag files
-     */
-    public void generateTagFiles() throws IOException {
-
-        // get our tagfile strings as input streams
-        InputStream formatsStream = new ByteArrayInputStream(formats.getBytes("UTF-8"));
-        InputStream finalStream = new ByteArrayInputStream(finalSequence.getBytes("UTF-8"));
-        InputStream supportingStream = new ByteArrayInputStream(supportingSequence.getBytes("UTF-8"));
-        InputStream accessStream = new ByteArrayInputStream(supportingAccess.getBytes("UTF-8"));
-
-        // WE STILL NEED TO ADD THESE TO THE BAG
-        // need to do this without having to write to disk.
-
-        // then need to add these tagfiles to the tagmanifest
-
-    }
-
-
-
-    /*
-        returns a hashmap of formats read from tagfiles/formats.txt
-     */
-
-    public void setFormatMap() {
-
-        // hash map of formats
-        formatMap = new HashMap<String, String>();
-
-        // split our formats string
-        String[] theFormats = formats.split("\n");
-
-        // for each line
-        for(String line : theFormats) {
-
-            // split it  up
-            String[] words = line.split("\\s");
-
-            // store it in the formatMap
-            formatMap.put(words[1], words[0]);
-        }
-
-    }
-
-    /*
-       returns a hashmap of access rights read from tagfiles/supporting.access.txt
     */
-
-    public void setAccessMap() {
-
-        // hash map of access rights
-        accessMap = new HashMap<String, String>();
-
-        // split our access rights string
-        String[] theRights = supportingAccess.split("\n");
-
-        // for each line
-        for(String line : theRights) {
-
-            // split it  up
-            String[] words = line.split("\\s");
-
-            // store it in the formatMap
-            accessMap.put(words[1], words[0]);
-        }
-
-    }
 
 
     /*
@@ -416,7 +302,7 @@ public class BagIt {
         R008 DSpace Item PRIMARY
      */
 
-    public TreeMap<Integer, BaggedItem> getSequencedPrimaries() {
+    public TreeMap<Integer, BaggedItem> getSequencedFinals() {
 
         TreeMap<Integer, BaggedItem> sequencedPrimaries = new TreeMap<Integer, BaggedItem>();
 
@@ -497,14 +383,12 @@ public class BagIt {
       returns the metadata
       data/metadata/metadata.xml
     */
-
-    public BaggedItem getMetadata() {
-
+    public BaggedItem getMetadataFile()
+    {
         BaggedItem metadata = new BaggedItem();
         metadata.setInputStream(theBag.getBagFile("data/metadata/metadata.xml").newInputStream());
         metadata.setFilename("metadata.xml");
         metadata.setFormat("text/xml");
-
         return metadata;
     }
 
@@ -513,8 +397,7 @@ public class BagIt {
       returns the licence for the item
       data/licence/licence.txt
     */
-
-    public BaggedItem getLicence() {
+    public BaggedItem getLicenceFile() {
 
         BaggedItem licence = new BaggedItem();
         licence.setInputStream(theBag.getBagFile("data/licence/licence.txt").newInputStream());
@@ -596,5 +479,98 @@ public class BagIt {
         return "http://duo.uio.no/terms/package/FSBagIt";
     }
 
+    private void setManifestsAndTagfiles() throws IOException
+    {
+        manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
+        tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
 
-} // end public class BagIt
+        // get the formats
+        StringWriter formatWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/formats.txt").newInputStream(), formatWriter, "UTF-8");
+        formats = formatWriter.toString();
+
+        // get the final sequence
+        StringWriter finalWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/final.sequence.txt").newInputStream(), finalWriter, "UTF-8");
+        finalSequence = finalWriter.toString();
+
+        // get the supporting sequence
+        StringWriter supportingWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.sequence.txt").newInputStream(), supportingWriter, "UTF-8");
+        supportingSequence = supportingWriter.toString();
+
+        // get the supporting access
+        StringWriter accessWriter = new StringWriter();
+        IOUtils.copy(theBag.getBagFile("tagfiles/supporting.access.txt").newInputStream(), accessWriter, "UTF-8");
+        supportingAccess = accessWriter.toString();
+
+        setFormatMap();
+
+        setAccessMap();
+
+    }
+
+    private void addMetadataBagFile(BagFile metadataBagFile)
+    {
+        // add the file
+        theBag.putBagFile(metadataBagFile);
+
+        // add the format to tagfiles/formats.txt
+        formats = formats + "text/xml\t" + metadataBagFile.getFilepath() + "\n";
+
+        // generate the checksum
+        String checksum = MessageDigestHelper.generateFixity(metadataBagFile.newInputStream(), Manifest.Algorithm.MD5);
+
+        // add file to payload manifest
+        manifest.put(metadataBagFile.getFilepath(), checksum);
+    }
+
+    /*
+        returns a hashmap of formats read from tagfiles/formats.txt
+     */
+
+    private void setFormatMap() {
+
+        // hash map of formats
+        formatMap = new HashMap<String, String>();
+
+        // split our formats string
+        String[] theFormats = formats.split("\n");
+
+        // for each line
+        for(String line : theFormats) {
+
+            // split it  up
+            String[] words = line.split("\\s");
+
+            // store it in the formatMap
+            formatMap.put(words[1], words[0]);
+        }
+
+    }
+
+    /*
+       returns a hashmap of access rights read from tagfiles/supporting.access.txt
+    */
+
+    private void setAccessMap() {
+
+        // hash map of access rights
+        accessMap = new HashMap<String, String>();
+
+        // split our access rights string
+        String[] theRights = supportingAccess.split("\n");
+
+        // for each line
+        for(String line : theRights) {
+
+            // split it  up
+            String[] words = line.split("\\s");
+
+            // store it in the formatMap
+            accessMap.put(words[1], words[0]);
+        }
+
+    }
+
+}

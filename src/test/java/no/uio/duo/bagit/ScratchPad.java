@@ -7,6 +7,7 @@ import nu.xom.Builder;
 import nu.xom.Document;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
@@ -119,21 +120,4 @@ public class ScratchPad
         bi.writeToFile();
     }
 
-    @Test
-    public void parsexml()
-            throws Exception
-    {
-        String xmlorig = "<fs:metadata xmlns:fs=\"ftp://studentweb.no/terms/\"><fs:name>Thor Heyerdahl</fs:name><fs:familyName>Heyerdahl</fs:familyName><fs:givenName>Thor</fs:givenName><fs:studentNumber>123456789</fs:studentNumber><fs:uid>theyerdahl</fs:uid><fs:foedselsnummer>987654321</fs:foedselsnummer><fs:postalAddress>Colla Micheri, Italy</fs:postalAddress><fs:email>t.heyerdahl@kontiki.com</fs:email><fs:telephoneNumber>0047 123456</fs:telephoneNumber><fs:subject><fs:subjectCode>AST3220</fs:subjectCode><fs:subjectTitle>Kosmologi I</fs:subjectTitle></fs:subject><fs:unitcode>123</fs:unitcode><fs:unitName>Arkeologi, konservering og historie</fs:unitName><dcterms:title xmlns:dcterms=\"http://purl.org/dc/terms/\">101 days around some of the world</dcterms:title><dcterms:title xmlns:dcterms=\"http://purl.org/dc/terms/\" xml:lang=\"nob\">101 days in the Pacific</dcterms:title><dcterms:language xmlns:dcterms=\"http://purl.org/dc/terms/\">nob</dcterms:language><dcterms:abstract xmlns:dcterms=\"http://purl.org/dc/terms/\" xml:lang=\"nob\">Thor Heyerdahl og fem andre dro fra Peru til Raroia i en selvkonstruert balsafl?te ved navn\n" +
-                "        Kon-Tiki.</dcterms:abstract><dcterms:abstract xmlns:dcterms=\"http://purl.org/dc/terms/\">In the Kon-Tiki Expedition, Heyerdahl and five fellow adventurers went to Peru, where\n" +
-                "        they constructed a pae-pae raft from balsa wood and other native materials, a raft that\n" +
-                "        they called the Kon-Tiki.</dcterms:abstract><dcterms:type xmlns:dcterms=\"http://purl.org/dc/terms/\">Master's thesis</dcterms:type><fs:embargoType>5 years</fs:embargoType><fs:embargoEndDate>01-01-2015</fs:embargoEndDate><fs:grade>pass</fs:grade></fs:metadata>";
-
-
-        String xml = "<fs:metadata xmlns:fs=\"http://studentweb.no/terms/\"><fs:name>Thor Heyerdahl</fs:name><fs:familyName>Heyerdahl</fs:familyName><fs:givenName>Thor</fs:givenName><fs:studentNumber>123456789</fs:studentNumber><fs:uid>theyerdahl</fs:uid><fs:foedselsnummer>987654321</fs:foedselsnummer><fs:postalAddress>Colla Micheri, Italy</fs:postalAddress><fs:email>t.heyerdahl@kontiki.com</fs:email><fs:telephoneNumber>0047 123456</fs:telephoneNumber><fs:subject><fs:subjectCode>AST3220</fs:subjectCode><fs:subjectTitle>Kosmologi I</fs:subjectTitle></fs:subject><fs:unitcode>123</fs:unitcode><fs:unitName>Arkeologi, konservering og historie</fs:unitName><fs:embargoType>5 years</fs:embargoType><fs:embargoEndDate>01-01-2015</fs:embargoEndDate><fs:grade>pass</fs:grade></fs:metadata>";
-
-
-        Builder parser = new Builder();
-        Document doc = parser.build(xml);
-        doc.getRootElement();
-    }
 }
