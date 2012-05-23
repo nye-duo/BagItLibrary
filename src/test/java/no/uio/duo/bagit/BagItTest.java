@@ -178,7 +178,7 @@ public class BagItTest {
             assertTrue(bagFinalSequence.exists());
 
             // get the primaries
-            TreeMap<Integer, BaggedItem> primaries = testBagIt.getSequencedPrimaries();
+            TreeMap<Integer, BaggedItem> primaries = testBagIt.getSequencedFinals();
             assertEquals("segway.jpg", primaries.get(1).getFilename());
             assertEquals("image/jpeg", primaries.get(1).getFormat());
             assertEquals((Integer)1, primaries.get(1).getSequence());
