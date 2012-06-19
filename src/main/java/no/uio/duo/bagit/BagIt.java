@@ -176,18 +176,15 @@ public class BagIt {
 
         // add the format to tagfiles/formats.txt
         formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + "\n";
-        //FileUtils.writeStringToFile(formats, new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // add the file to the supporting.sequence.txt
         supportingSequence = supportingSequence + supportingSequenceCounter + "\t" + dataSupporting + "\n";
-        //FileUtils.writeStringToFile(supportingSequence, supportingSequenceCounter + "\t" + dataSupporting + file.getName() + "\n", true);
 
         // increment the sequence
         supportingSequenceCounter++;
 
         // add the file tagfiles/supporting.access.txt as access (open|closed)
         supportingAccess = supportingAccess + access + "\t" + dataSupporting + "\n";
-        //FileUtils.writeStringToFile(supportingAccess, access + "\t" + dataSupporting + supportingFile.getName() + "\n", true);
 
         // generate the checksum
         String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataSupporting, file).newInputStream(), Manifest.Algorithm.MD5);
@@ -315,19 +312,24 @@ public class BagIt {
             // split it  up
             String[] words = line.split("\\s");
 
-            // get the path
-            String[] path = words[1].split("/");
+            // check to make sure it's not a blank line
+            if(words.length > 0)
+            {
 
-            // the bagged item
-            BaggedItem baggedItem = new BaggedItem();
+                // get the path
+                String[] path = words[1].split("/");
 
-            baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
-            baggedItem.setFilename(path[path.length - 1]);
-            baggedItem.setFormat(formatMap.get(words[1]));
-            baggedItem.setSequence(Integer.parseInt(words[0]));
+                // the bagged item
+                BaggedItem baggedItem = new BaggedItem();
 
-            // create the node
-            sequencedPrimaries.put(Integer.parseInt(words[0]), baggedItem);
+                baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
+                baggedItem.setFilename(path[path.length - 1]);
+                baggedItem.setFormat(formatMap.get(words[1]));
+                baggedItem.setSequence(Integer.parseInt(words[0]));
+
+                // create the node
+                sequencedPrimaries.put(Integer.parseInt(words[0]), baggedItem);
+            }
         }
 
 
@@ -356,22 +358,26 @@ public class BagIt {
             // split it  up
             String[] words = line.split("\\s+");
 
-            // only if the access rights match
-            if (accessRights.equals(accessMap.get(words[1]))) {
+            // check to make sure it's not a blank line
+            if(words.length > 0)
+            {
 
-                String[] path = words[1].split("/");
+                // only if the access rights match
+                if (accessRights.equals(accessMap.get(words[1]))) {
 
-                // the bagged item
-                BaggedItem baggedItem = new BaggedItem();
+                    String[] path = words[1].split("/");
 
-                baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
-                baggedItem.setFilename(path[path.length - 1]);
-                baggedItem.setFormat(formatMap.get(words[1]));
-                baggedItem.setSequence(Integer.parseInt(words[0]));
+                    // the bagged item
+                    BaggedItem baggedItem = new BaggedItem();
 
-                // create the node
-                sequencedSecondaries.put(Integer.parseInt(words[0]), baggedItem);
+                    baggedItem.setInputStream(theBag.getBagFile(words[1]).newInputStream());
+                    baggedItem.setFilename(path[path.length - 1]);
+                    baggedItem.setFormat(formatMap.get(words[1]));
+                    baggedItem.setSequence(Integer.parseInt(words[0]));
 
+                    // create the node
+                    sequencedSecondaries.put(Integer.parseInt(words[0]), baggedItem);
+                }
             }
         }
 
@@ -543,8 +549,12 @@ public class BagIt {
             // split it  up
             String[] words = line.split("\\s");
 
-            // store it in the formatMap
-            formatMap.put(words[1], words[0]);
+            // check to make sure it's not a blank line
+            if(words.length > 0)
+            {
+                // store it in the formatMap
+                formatMap.put(words[1], words[0]);
+            }
         }
 
     }
@@ -567,8 +577,12 @@ public class BagIt {
             // split it  up
             String[] words = line.split("\\s");
 
-            // store it in the formatMap
-            accessMap.put(words[1], words[0]);
+            // check to make sure it's not a blank line
+            if(words.length > 0)
+            {
+                // store it in the formatMap
+                accessMap.put(words[1], words[0]);
+            }
         }
 
     }
