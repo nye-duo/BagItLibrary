@@ -16,6 +16,13 @@ import static org.junit.Assert.assertTrue;
 public class ScratchPad
 {
     @Test
+    public void arr() throws Exception
+    {
+        File bagfile = new File("/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip");
+        BagIt bi = new BagIt(bagfile);
+    }
+
+    @Test
     public void construct() throws Exception
     {
         String fileBase = System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/";

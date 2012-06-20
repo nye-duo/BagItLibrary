@@ -358,8 +358,9 @@ public class BagIt {
             // split it  up
             String[] words = line.split("\\s+");
 
-            // check to make sure it's not a blank line
-            if(words.length > 0)
+            // check to make sure it's not a blank line and that the line is valid
+            // skip if not
+            if (words.length == 2)
             {
 
                 // only if the access rights match
@@ -568,17 +569,24 @@ public class BagIt {
         // hash map of access rights
         accessMap = new HashMap<String, String>();
 
+        // only proceed if there's any point
+        if (supportingAccess == null || "".equals(supportingAccess))
+        {
+            return;
+        }
+
         // split our access rights string
         String[] theRights = supportingAccess.split("\n");
 
         // for each line
-        for(String line : theRights) {
+        for (String line : theRights) {
 
             // split it  up
             String[] words = line.split("\\s");
 
-            // check to make sure it's not a blank line
-            if(words.length > 0)
+            // check to make sure it's not a blank line and has the appropriate
+            // number of parts.  Skip if invalid.
+            if (words.length == 2)
             {
                 // store it in the formatMap
                 accessMap.put(words[1], words[0]);
