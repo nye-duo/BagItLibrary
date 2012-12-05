@@ -116,7 +116,19 @@ public class BagIt {
         adds a final file to our BagIt
      */
 
-    public void addFinalFile(File file, int sequence) {
+
+    public void addFinalFile(File file)
+    {
+        // if we don't have a sequence number
+        addFinalFile(file, null, -1);
+    }
+
+    public void addFinalFile(File file, int sequence)
+    {
+        this.addFinalFile(file, null, sequence);
+    }
+
+    public void addFinalFile(File file, String mimeType, int sequence) {
 
         // check if we have a sequence
         if (sequence >= 0)
@@ -132,7 +144,11 @@ public class BagIt {
         theBag.putBagFile(new FileBagFile(dataFinal, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataFinal + "\n";
+        if (mimeType == null)
+        {
+            mimeType = new MimetypesFileTypeMap().getContentType(file);
+        }
+        formats = formats + mimeType + "\t" + dataFinal + "\n";
 
         // add the file to the final.sequence.txt
         finalSequence = finalSequence + finalSequenceCounter + "\t" + dataFinal + "\n";
@@ -149,17 +165,27 @@ public class BagIt {
 
     }
 
-    public void addFinalFile(File file) {
-
-        // if we don't have a sequence number
-        addFinalFile(file, -1);
-    }
 
     /*
         adds a supporting file to our BagIt
      */
 
-    public void addSupportingFile(File file, int sequence, String access) {
+    public void addSupportingFile(File file, String access)
+    {
+
+        // if we don't have a sequence number
+        addSupportingFile(file, null, -1, access);
+    }
+
+    public void addSupportingFile(File file, int sequence, String access)
+    {
+
+        // if we don't have a sequence number
+        addSupportingFile(file, null, sequence, access);
+    }
+
+
+    public void addSupportingFile(File file, String mimeType, int sequence, String access) {
 
         // check if we have a sequence
         if (sequence >= 0)
@@ -175,7 +201,11 @@ public class BagIt {
         theBag.putBagFile(new FileBagFile(dataSupporting, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataSupporting + "\n";
+        if (mimeType == null)
+        {
+            mimeType = new MimetypesFileTypeMap().getContentType(file);
+        }
+        formats = formats + mimeType + "\t" + dataSupporting + "\n";
 
         // add the file to the supporting.sequence.txt
         supportingSequence = supportingSequence + supportingSequenceCounter + "\t" + dataSupporting + "\n";
@@ -194,13 +224,6 @@ public class BagIt {
 
 
     }
-
-    public void addSupportingFile(File file, String access) {
-
-        // if we don't have a sequence number
-        addSupportingFile(file, -1, access);
-    }
-
 
     public void addMetadata(Metadata metadata)
     {
@@ -222,7 +245,14 @@ public class BagIt {
     /*
         add a licence file in the licence directory
      */
-    public void addLicenceFile(File file) {
+
+    public void addLicenceFile(File file)
+    {
+        this.addLicenceFile(file, null);
+    }
+
+    public void addLicenceFile(File file, String mimeType)
+    {
 
         // data licence directory
         String dataLicence = "data/licence/" + file.getName();
@@ -231,7 +261,11 @@ public class BagIt {
         theBag.putBagFile(new FileBagFile(dataLicence, file));
 
         // add the format to tagfiles/formats.txt
-        formats = formats + new MimetypesFileTypeMap().getContentType(file) + "\t" + dataLicence + "\n";
+        if (mimeType == null)
+        {
+            mimeType = new MimetypesFileTypeMap().getContentType(file);
+        }
+        formats = formats + mimeType + "\t" + dataLicence + "\n";
 
         // generate the checksum
         String checksum = MessageDigestHelper.generateFixity(new FileBagFile(dataLicence, file).newInputStream(), Manifest.Algorithm.MD5);

@@ -1,0 +1,6 @@
+open	data/supporting/MainArticle.odt
+open	data/supporting/AppendixA.odt
+open	data/supporting/AppendixB.odt
+closed	data/supporting/UserData1.odt
+closed	data/supporting/UserData2.odt
+closed	data/supporting/UserData3.odt

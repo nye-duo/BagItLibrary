@@ -43,17 +43,17 @@ public class ScratchPad
 
         BagIt bi = new BagIt(new File(out));
 
-        bi.addFinalFile(new File(firstFinal), 1);
-        bi.addFinalFile(new File(secondFinal), 2);
-        bi.addFinalFile(new File(thirdFinal), 3);
+        bi.addFinalFile(new File(firstFinal), "application/pdf", 1);
+        bi.addFinalFile(new File(secondFinal), "application/pdf" , 2);
+        bi.addFinalFile(new File(thirdFinal), "application/pdf", 3);
 
-        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
-        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
-        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+        bi.addSupportingFile(new File(firstOSecondary), "application/vnd.oasis.opendocument.text", 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), "application/vnd.oasis.opendocument.text", 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), "application/vnd.oasis.opendocument.text", 3, "open");
 
-        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
-        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
-        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+        bi.addSupportingFile(new File(firstCSecondary), "application/vnd.oasis.opendocument.text", 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), "application/vnd.oasis.opendocument.text", 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), "application/vnd.oasis.opendocument.text", 3, "closed");
 
         bi.addMetadataFile(new File(metadata));
         bi.addLicenceFile(new File(licence));

@@ -1,0 +1,11 @@
+application/pdf	data/final/MainArticle.pdf
+application/pdf	data/final/AppendixA.pdf
+application/pdf	data/final/AppendixB.pdf
+application/vnd.oasis.opendocument.text	data/supporting/MainArticle.odt
+application/vnd.oasis.opendocument.text	data/supporting/AppendixA.odt
+application/vnd.oasis.opendocument.text	data/supporting/AppendixB.odt
+application/vnd.oasis.opendocument.text	data/supporting/UserData1.odt
+application/vnd.oasis.opendocument.text	data/supporting/UserData2.odt
+application/vnd.oasis.opendocument.text	data/supporting/UserData3.odt
+text/xml	data/metadata/metadata.xml
+text/plain	data/licence/licence.txt

@@ -1,0 +1,6 @@
+1	data/supporting/MainArticle.odt
+2	data/supporting/AppendixA.odt
+3	data/supporting/AppendixB.odt
+1	data/supporting/UserData1.odt
+2	data/supporting/UserData2.odt
+3	data/supporting/UserData3.odt

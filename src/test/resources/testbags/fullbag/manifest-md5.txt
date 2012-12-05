@@ -1,0 +1,11 @@
+9d3d40c30afaabc390e13e92f123fe29  data/final/MainArticle.pdf
+696ced4148715dd0e13709f098f8bd16  data/final/AppendixA.pdf
+d59356e80d68f6cfa1ed1dccb0e76647  data/final/AppendixB.pdf
+5182c66d884b2c3be9cd23e61af2335a  data/supporting/MainArticle.odt
+51f814b8b16dba0b4cac7d3c149aeb7f  data/supporting/AppendixA.odt
+b643b6b88906c894b63fe9721b939534  data/supporting/AppendixB.odt
+cca90c02ddfbcb07e96e1327081a1ab8  data/supporting/UserData1.odt
+7fd21515452e1baeca0d3540042dd605  data/supporting/UserData2.odt
+9bdc82fc7e80d7469c0af89a7d312d04  data/supporting/UserData3.odt
+b8ed3e69a9f5d80547749ee24671c563  data/metadata/metadata.xml
+f40f75a189e7ebd3ae4638474df58c69  data/licence/licence.txt
