@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import java.io.InputStream;
 
+/**
+ * Class to represent a file that can be added to the BagIt package
+ */
 public class BaggedItem
 {
     private InputStream inputStream;

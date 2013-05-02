@@ -41,6 +41,35 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * Main class which manages interactions with a StudentWeb formatted BagIt file.
+ *
+ * This allows the BagIt packages to be constructed from files on disk, or for a
+ * zipped BagIt to be read and opened.
+ *
+ * The StudentWeb Bag format is as follows:
+ *
+ * <pre>
+ * base directory/
+ * |   bagit.txt
+ * |   manifest-md5.txt
+ * |   tagmanifest-md5.txt
+ * \--- data/
+ *      \--- final
+ *          |   [final version files]
+ *      \--- supporting
+ *          |   [supporting files]
+ *      \--- licence/
+ *          |   licence.txt
+ *      \--- metadata/
+ *          |   metadata.xml
+ *      \--- tagfiles/
+ *          |   supporting.access.txt
+ *          |   formats.txt
+ *          |   final.sequence.txt
+ *          |   supporting.sequence.txt
+ *</pre>
+ */
 public class BagIt {
 
     // our BagFactory
@@ -62,35 +91,24 @@ public class BagIt {
 
     File bagFile = null;
 
-    /*
-        creates a BagIt from an existing directory organised in the correct
-        format
-
-        <base directory>/
-        |   bagit.txt
-        |   manifest-md5.txt
-        |   tagmanifest-md5.txt
-        \--- data/
-            \--- final
-                |   [final version files]
-            \--- supporting
-                |   [supporting files]
-            \--- licence/
-                |   licence.txt
-            \--- metadata/
-                |   metadata.xml
-        \--- tagfiles/
-            |   supporting.access.txt
-            |   formats.txt
-            |   final.sequence.txt
-            |   supporting.sequence.txt
-    */
+    /**
+     * Create a BagIt object around a directory specified at the filePath
+     *
+     * @param filePath  Path to BagIt structure
+     * @throws IOException
+     */
     public BagIt(String filePath)
             throws IOException
     {
         this(new File(filePath));
     }
 
+    /**
+     * Create a BagIt object around a file object provided
+     *
+     * @param file  File object representing the BagIt structure
+     * @throws IOException
+     */
     public BagIt(File file)
             throws IOException
     {
@@ -112,22 +130,38 @@ public class BagIt {
         }
     }
 
-    /*
-        adds a final file to our BagIt
+    /**
+     * Add a file to the Bag, which is a final version file of the item (see the class documentation regarding
+     * structure of the Bag).
+     *
+     * @param file  File object to add to the Bag
      */
-
-
     public void addFinalFile(File file)
     {
         // if we don't have a sequence number
         addFinalFile(file, null, -1);
     }
 
+    /**
+     * Add a file to the Bag, which is a final version file of the item (see the class documentation regarding
+     * structure of the Bag).  Give it the specified sequence number in the list of final files
+     *
+     * @param file  File object to add to the Bag
+     * @param sequence  position in the sequence of final files in the Bag
+     */
     public void addFinalFile(File file, int sequence)
     {
         this.addFinalFile(file, null, sequence);
     }
 
+    /**
+     * Add a file to the Bag, which is a final version file of the item (see the class documentation regarding
+     * structure of the Bag).  Give it the specified mime type and sequence number in the list of final files
+     *
+     * @param file  File object to add to the Bag
+     * @param mimeType  Mimetype of the file object.  If this is null, we will attempt to guess
+     * @param sequence  position in the sequence of final files in the Bag.  If this is -1 we will just add it to the end of the current list
+     */
     public void addFinalFile(File file, String mimeType, int sequence) {
 
         // check if we have a sequence
@@ -161,32 +195,48 @@ public class BagIt {
 
         // add file to payload manifest
         manifest.put(dataFinal, checksum);
-
-
     }
 
-
-    /*
-        adds a supporting file to our BagIt
+    /**
+     * Add a file to the Bag, which is supporting material for the item (see the class documentation regarding
+     * structure of the Bag).  Give it the access type specified.
+     *
+     * @param file  File object to add to the Bag
+     * @param access    Access conditions of the item.  Should be "open" or "closed"
      */
-
     public void addSupportingFile(File file, String access)
     {
-
         // if we don't have a sequence number
         addSupportingFile(file, null, -1, access);
     }
 
+    /**
+     * Add a file to the Bag, which is supporting material for the item (see the class documentation regarding
+     * structure of the Bag).  Give it the access type specified, and the position specified by the sequence
+     * in the existing list of supporting files
+     *
+     * @param file  File object to add to the Bag
+     * @param sequence  position in the sequence of final files in the Bag.  If this is -1 we will just add it to the end of the current list
+     * @param access    Access conditions of the item.  Should be "open" or "closed"
+     */
     public void addSupportingFile(File file, int sequence, String access)
     {
-
         // if we don't have a sequence number
         addSupportingFile(file, null, sequence, access);
     }
 
-
-    public void addSupportingFile(File file, String mimeType, int sequence, String access) {
-
+    /**
+     * Add a file to the Bag, which is supporting material for the item (see the class documentation regarding
+     * structure of the Bag).  Give it the mimetype and access type specified, and the position specified by the sequence
+     * in the existing list of supporting files
+     *
+     * @param file  File object to add to the Bag
+     * @param mimeType  Mimetype of the file object.  If this is null, we will attempt to guess
+     * @param sequence  position in the sequence of final files in the Bag.  If this is -1 we will just add it to the end of the current list
+     * @param access    Access conditions of the item.  Should be "open" or "closed"
+     */
+    public void addSupportingFile(File file, String mimeType, int sequence, String access)
+    {
         // check if we have a sequence
         if (sequence >= 0)
         {
@@ -221,10 +271,13 @@ public class BagIt {
 
         // add file to payload manifest
         manifest.put(dataSupporting, checksum);
-
-
     }
 
+    /**
+     * Add the provided metadata object to the Bag in the appropriate file format
+     *
+     * @param metadata  Metadata object
+     */
     public void addMetadata(Metadata metadata)
     {
         String mdxml = metadata.toXML();
@@ -232,8 +285,10 @@ public class BagIt {
         this.addMetadataBagFile(sbf);
     }
 
-    /*
-        add a metadata file in the metadata directory
+    /**
+     * Add an appropriately formatted metadata file as the metadata file for this Bag
+     *
+     * @param file  File object containing the metadata
      */
     public void addMetadataFile(File file)
     {
@@ -242,18 +297,24 @@ public class BagIt {
         this.addMetadataBagFile(fbf);
     }
 
-    /*
-        add a licence file in the licence directory
+    /**
+     * Set a licence file for the Bag
+     *
+     * @param file  File object containing the licence
      */
-
     public void addLicenceFile(File file)
     {
         this.addLicenceFile(file, null);
     }
 
+    /**
+     * Set a licence file for the Bag
+     *
+     * @param file  File object containing the licence
+     * @param mimeType  mimetype of the licence object
+     */
     public void addLicenceFile(File file, String mimeType)
     {
-
         // data licence directory
         String dataLicence = "data/licence/" + file.getName();
 
@@ -272,9 +333,12 @@ public class BagIt {
 
         // add file to payload manifest
         manifest.put(dataLicence, checksum);
-
     }
 
+    /**
+     * Write the current state of the BagIt object out to the file the BagIt object is
+     * constructed over
+     */
     public void writeToFile()
     {
         // write all of our tagfiles
@@ -308,31 +372,11 @@ public class BagIt {
         this.theBag.write(new ZipWriter(bagFactory), this.bagFile);
     }
 
-    /*
-        generates the manifests
+    /**
+     * Return the list of primary files sorted in sequence
+     *
+     * @return
      */
-
-    /* FIXME: this isn't used, but not deleting it right now, as not sure if it might have some utility
-        later
-    public void generateManifests() {
-
-        theBag.putBagFile(theBag.getBagPartFactory().createBagInfoTxt());
-        theBag.putBagFile(theBag.getBagPartFactory().createBagItTxt());
-        theBag.putBagFile(theBag.getBagPartFactory().createFetchTxt());
-        theBag.putBagFile(manifest);
-        theBag.putBagFile(tagmanifest);
-        theBag.makeComplete();
-    }
-    */
-
-
-    /*
-        returns the list of primary files in sequence
-        data/final/[final version files] ordered by tagfiles/final.sequence.txt
-
-        R008 DSpace Item PRIMARY
-     */
-
     public TreeMap<Integer, BaggedItem> getSequencedFinals() {
 
         TreeMap<Integer, BaggedItem> sequencedPrimaries = new TreeMap<Integer, BaggedItem>();
@@ -366,19 +410,15 @@ public class BagIt {
             }
         }
 
-
         return sequencedPrimaries;
     }
 
-
-    /*
-       returns the list of secondary files in sequence
-       data/supporting/[supporting files] ordered by tagfiles/supporting.sequence.txt
-
-       R009 DSpace Item SECONDARY and R010 SECONDARY_RESTRICTED
-    */
-
-
+    /**
+     * Return the list of secondary files sorted in sequence
+     *
+     * @param accessRights  Access rights filter - provide "open" or "closed", to obtain only those with that access right
+     * @return
+     */
     public TreeMap<Integer, BaggedItem> getSequencedSecondaries(String accessRights) {
 
         TreeMap<Integer, BaggedItem> sequencedSecondaries = new TreeMap<Integer, BaggedItem>();
@@ -420,10 +460,11 @@ public class BagIt {
     }
 
 
-    /*
-      returns the metadata
-      data/metadata/metadata.xml
-    */
+    /**
+     * Get the Metadata file from the Bag
+     *
+     * @return
+     */
     public BaggedItem getMetadataFile()
     {
         BaggedItem metadata = new BaggedItem();
@@ -434,10 +475,11 @@ public class BagIt {
     }
 
 
-    /*
-      returns the licence for the item
-      data/licence/licence.txt
-    */
+    /**
+     * Get the licence file from the Bag
+     *
+     * @return
+     */
     public BaggedItem getLicenceFile() {
 
         BaggedItem licence = new BaggedItem();
@@ -448,79 +490,100 @@ public class BagIt {
         return licence;
     }
 
-    /*
-        Looks for access set for filename in
-        tagfiles/supporting.access.txt
-
-        will be open or closed
-        open -> DSpace Item SECONDARY
-        closed -> DSpace Item SECONDARY_RESTRICTED
-    */
-    public String getSupportingAccess(String filename) throws IOException {
-
+    /**
+     * Obtain the access privilege for the specified filename
+     *
+     * @param filename
+     * @return
+     * @throws IOException
+     */
+    public String getSupportingAccess(String filename)
+            throws IOException
+    {
         return accessMap.get(filename);
-
     }
 
-    /*
-       verifies the bag against it's manifest
-    */
-    public boolean verifyPayloadManifest() {
+    /**
+     * Verify the Bag against its manifest
+     *
+     * @return
+     */
+    public boolean verifyPayloadManifest()
+    {
 
         return theBag.verifyPayloadManifests().isSuccess();
     }
 
-    /*
-        verifies the bag against it's tag manifest
+    /**
+     * Verify the Bag against its tag manifest
+     *
+     * @return
      */
-    public boolean verifyTagManifest() {
+    public boolean verifyTagManifest()
+    {
 
         return theBag.verifyTagManifests().isSuccess();
     }
 
-    /*
-        gets the file for the bag
+    /**
+     * Get the file representing the whole bag
+     *
+     * @return
+     * @throws IOException
      */
-    public InputStream getFile() throws IOException {
+    public InputStream getFile()
+            throws IOException
+    {
 
         return FileUtils.openInputStream(this.bagFile);
     }
 
-    /*
-        gets the file name for the bag
+    /**
+     * Get the filename for the whole Bag
+     *
+     * @return
      */
     public String getName() {
 
         return this.bagFile.getName();
     }
 
-    /*
-        gets the MD5 for the bag
+    /**
+     * Get the MD5 for the whole Bag
+     *
+     * @return
      */
     public String getMD5() {
 
         return (MessageDigestHelper.generateFixity(this.bagFile, Manifest.Algorithm.MD5));
     }
 
-    /*
-        gets the mimetype for the bag
+    /**
+     * Get the mimetype of the packaged Bag
+     *
+     * @return
      */
-
     public String getMimetype() {
 
         return "application/zip";
     }
 
-    /*
-        gets the packaging for the bag
+    /**
+     * Get the SWORDv2 packaging identifier for the Bag
+     * @return
      */
-
     public String getPackaging() {
 
         return "http://duo.uio.no/terms/package/FSBagIt";
     }
 
-    private void setManifestsAndTagfiles() throws IOException
+    /**
+     * Set the Manifest and Tag Files for the Bag
+     *
+     * @throws IOException
+     */
+    private void setManifestsAndTagfiles()
+            throws IOException
     {
         manifest = theBag.getPayloadManifest(Manifest.Algorithm.MD5);
         tagmanifest = theBag.getTagManifest(Manifest.Algorithm.MD5);
