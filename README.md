@@ -28,13 +28,7 @@ The Bags have the following structure:
 		   |   final.sequence.txt
 		   |   supporting.sequence.txt
 
-This is as per the technical design documentation available at:
-
-	https://docs.google.com/document/d/1mR5r3XvCkM2oLy08hDVMdjUGmdAh0lChVcxtAkvzmyI/edit
-
-	(see Annex B)
-
-
+More information is available in the technical overview of the StudentWeb integration available at: [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit)
 
 Build/Install
 -------------
@@ -42,9 +36,7 @@ Build/Install
 ###LOC BagIt Library
 
 This library depends on the Library of Congress BagIt Library version 4.1 which is not currently available in the Maven
-central repository.  It can be downloaded from:
-
-    http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download
+central repository.  It can be downloaded from: [http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download](http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download)
 
 Once downloaded it can be installed into the local maven repository with
 
@@ -238,9 +230,7 @@ Metadata
 
 ###Introduction
 
-The metadata format for use in the BagIt package when transferring content from StudentWeb to DUO is defined here:
-
-	https://docs.google.com/spreadsheet/ccc?key=0Ah-HG8-1YyIldEZmbXFuQWU1bXNWWUJ3N3Fud3hfUlE
+The metadata format for use in the BagIt package when transferring content from StudentWeb to DUO is defined in the functional overview [https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit](https://docs.google.com/a/cottagelabs.com/document/d/17Iiswcz_LkSMgdhEZIesV1BTrijRNsPWAyH29-L1rQg/edit)
 
 The Metadata object in this library provides an interface to create and read documents which meet this specification
 to ensure that they are correctly constructed for the package.
@@ -251,7 +241,7 @@ A blank metadata object can be constructed thus:
 
 	Metadata metadata = new Metadata();
 
-If you have a pre-existing XOM XML Element, the metadata object can be initialised around it thus:
+If you have a pre-existing [XOM](http://xom.nu/) XML Element, the metadata object can be initialised around it thus:
 
 	Metadata metadata = new Metadata(xomElement);
 
