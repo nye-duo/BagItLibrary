@@ -33,15 +33,6 @@ More information is available in the technical overview of the StudentWeb integr
 Build/Install
 -------------
 
-###LOC BagIt Library
-
-This library depends on the Library of Congress BagIt Library version 4.1 which is not currently available in the Maven
-central repository.  It can be downloaded from: [http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download](http://sourceforge.net/projects/loc-xferutils/files/loc-bil-java-library/4.1/bagit-4.1-src.zip/download)
-
-Once downloaded it can be installed into the local maven repository with
-
-	mvn install
-
 ###BagItLibrary for Student Web
 
 Once these non-maven-central-repo dependencies have been installed, then it's possible to compile this library with:
