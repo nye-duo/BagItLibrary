@@ -30,14 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import static org.junit.Assert.*;
 
-import gov.loc.repository.bagit.*;
-import gov.loc.repository.bagit.filesystem.DirNode;
-import gov.loc.repository.bagit.filesystem.FileSystem;
-import gov.loc.repository.bagit.filesystem.FileSystemNode;
-import gov.loc.repository.bagit.filesystem.impl.FileFileSystem;
-import gov.loc.repository.bagit.filesystem.impl.ZipFileSystem;
-import gov.loc.repository.bagit.impl.ManifestWriterImpl;
-import gov.loc.repository.bagit.utilities.FormatHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.junit.Test;

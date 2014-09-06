@@ -1,17 +1,9 @@
 package no.uio.duo.bagit;
 
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagItTxt;
-import gov.loc.repository.bagit.writer.impl.ZipWriter;
-import nu.xom.Builder;
-import nu.xom.Document;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ScratchPad
 {
