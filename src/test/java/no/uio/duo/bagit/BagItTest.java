@@ -54,6 +54,7 @@ public class BagItTest {
         create a bag from an existing directory in the correct format
      */
 
+    /*
     @Test
     public void testBagConstructorExistingBag() throws Exception {
 
@@ -79,6 +80,7 @@ public class BagItTest {
 
 
     }
+    */
 
     /*
         create empty bag
@@ -147,6 +149,7 @@ public class BagItTest {
     /*
         create a bag and get primaries
      */
+    /*
     @Test
     public void testBagGetPrimaries() throws Exception {
 
@@ -198,6 +201,7 @@ public class BagItTest {
 
 
     }
+    */
 
     /*
        create a bag from a zip and check values

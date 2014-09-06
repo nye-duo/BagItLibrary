@@ -18,7 +18,8 @@ public class ScratchPad
     @Test
     public void arr() throws Exception
     {
-        File bagfile = new File("/home/richard/Dropbox/Documents/DUO/deposit/deposit.zip");
+        String fullbag = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag.zip";
+        File bagfile = new File(fullbag);
         BagIt bi = new BagIt(bagfile);
     }
 
@@ -39,7 +40,7 @@ public class ScratchPad
         String metadata = fileBase + "metadata.xml";
         String licence = fileBase + "licence.txt";
 
-        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag.zip";
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag3.zip";
 
         BagIt bi = new BagIt(new File(out));
 
@@ -78,7 +79,7 @@ public class ScratchPad
         // String metadata = fileBase + "metadata.xml";
         String licence = fileBase + "licence.txt";
 
-        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag.zip";
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag4.zip";
 
         Metadata metadata = new Metadata();
 
