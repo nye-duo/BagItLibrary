@@ -120,4 +120,49 @@ public class ScratchPad
         bi.writeToFile();
     }
 
+    @Test
+    public void massive() throws Exception
+    {
+        String fileBase = "/home/richard/Dropbox/Camera Uploads";
+        File folder = new File(fileBase);
+        File[] listOfFiles = folder.listFiles();
+
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/bigbag.zip";
+        BagIt bi = new BagIt(new File(out));
+
+        for (int i = 0; i < listOfFiles.length; i++)
+        {
+            if (listOfFiles[i].isFile())
+            {
+                bi.addFinalFile(listOfFiles[i]);
+            }
+        }
+
+        bi.writeToFile();
+    }
+
+    @Test
+    public void massive2() throws Exception
+    {
+        String fileBase = "/home/richard/Dropbox/Camera Uploads";
+        File folder = new File(fileBase);
+        File[] listOfFiles = folder.listFiles();
+
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/bigbag2.zip";
+        BagIt bi = new BagIt(new File(out));
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (listOfFiles[i].isFile())
+            {
+                bi.addFinalFile(listOfFiles[i]);
+            }
+        }
+
+        String bigfile = "/home/richard/tmp/bigbag.zip";
+        bi.addSupportingFile(new File(bigfile), "open");
+
+        bi.writeToFile();
+    }
+
 }
