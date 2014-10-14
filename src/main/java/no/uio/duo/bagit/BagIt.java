@@ -148,12 +148,30 @@ public class BagIt
     public void loadBag(File file)
             throws IOException
     {
+        // unset the base directory, as when reading the file, the filname may not be the same
+        // as the internal base directory
+        this.baseDir = null;
+
         this.zipFile = new ZipFile(file);
         Enumeration e = zipFile.entries();
         List<ZipEntry> tagEntries = new ArrayList<ZipEntry>();
         while (e.hasMoreElements())
         {
             ZipEntry entry = (ZipEntry) e.nextElement();
+
+            if (this.baseDir == null)
+            {
+                // we need to calculate the base directory that the package is using
+                String[] pathbits = entry.getName().split("/");
+                if (pathbits.length > 0) {
+                    this.baseDir = pathbits[0] + "/";
+                }
+                else
+                {
+                    throw new RuntimeException("The internal structure of the bag is wrong - could not find a suitable base directory");
+                }
+            }
+
             if (entry.getName().startsWith(this.baseDir + "data/final/"))
             {
                 BagFileReference bfr = new BagFileReference();

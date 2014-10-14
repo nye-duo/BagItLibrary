@@ -121,6 +121,61 @@ public class ScratchPad
     }
 
     @Test
+    public void writeThenRead() throws Exception
+    {
+        String fileBase = System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/";
+
+        String firstFinal = fileBase + "MainArticle.pdf";
+        String secondFinal = fileBase + "AppendixA.pdf";
+        String thirdFinal = fileBase + "AppendixB.pdf";
+        String firstOSecondary = fileBase + "MainArticle.odt";
+        String secondOSecondary = fileBase + "AppendixA.odt";
+        String thirdOSecondary = fileBase + "AppendixB.odt";
+        String firstCSecondary = fileBase + "UserData1.odt";
+        String secondCSecondary = fileBase + "UserData2.odt";
+        String thirdCSecondary = fileBase + "UserData3.odt";
+        String metadata = fileBase + "metadata.xml";
+        String licence = fileBase + "licence.txt";
+
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/fullbag5.zip";
+
+        BagIt bi = new BagIt(new File(out));
+
+        bi.addFinalFile(new File(firstFinal), 1);
+        bi.addFinalFile(new File(secondFinal), 2);
+        bi.addFinalFile(new File(thirdFinal), 3);
+
+        bi.addSupportingFile(new File(firstOSecondary), 1, "open");
+        bi.addSupportingFile(new File(secondOSecondary), 2, "open");
+        bi.addSupportingFile(new File(thirdOSecondary), 3, "open");
+
+        bi.addSupportingFile(new File(firstCSecondary), 1, "closed");
+        bi.addSupportingFile(new File(secondCSecondary), 2, "closed");
+        bi.addSupportingFile(new File(thirdCSecondary), 3, "closed");
+
+        bi.addMetadataFile(new File(metadata));
+        bi.addLicenceFile(new File(licence));
+
+        bi.writeToFile();
+
+        // now read the bagit in
+        BagIt biin = new BagIt(new File(out));
+
+        BaggedItem baggedItem = biin.getMetadataFile();
+    }
+
+    @Test
+    public void readDeposit() throws Exception
+    {
+        String depositFile = System.getProperty("user.dir") + "/src/test/resources/testbags/SWORD-4cabb358-5dce-4b66-a10b-5edadb2a2bbb";
+
+        // now read the bagit in
+        BagIt biin = new BagIt(new File(depositFile));
+
+        BaggedItem baggedItem = biin.getMetadataFile();
+    }
+
+    @Test
     public void massive() throws Exception
     {
         String fileBase = "/home/richard/Dropbox/Camera Uploads";
