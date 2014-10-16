@@ -33,12 +33,17 @@ More information is available in the technical overview of the StudentWeb integr
 Build/Install
 -------------
 
-###BagItLibrary for Student Web
+This library has no significant external dependencies, so it can be cloned from the repository and compiled straight away as follows:
 
-Once these non-maven-central-repo dependencies have been installed, then it's possible to compile this library with:
+    git clone https://github.com/nye-duo/BagItLibrary.git
+
+then in the resulting directory:
 
     mvn clean package
 
+to install into your local maven repository just use:
+
+    mvn install
 
 Bags
 ----
@@ -46,10 +51,13 @@ Bags
 ###Construction
 
 A BagIt object must be constructed with the path to a zip file; this path may point to an existing file from which
-the library should construct an object, or it may point to a non-existant file, in which case the BagIt will be
-constructed in-memory and then ultimately serialised to that location.
+the library should construct an object, or it may point to a non-existent file, in which case the BagIt will be
+constructed by-reference and then ultimately serialised to that location.
 
 	BagIt bag = new BagIt("/path/to/bag.zip");
+
+Note that you cannot read a BagIt file from an existing zip file and then re-write it back to that same file (due to
+the low-memory approach the library uses to read and write files).  Attempting to do so will result in an exception.
 
 ###Adding Files
 
