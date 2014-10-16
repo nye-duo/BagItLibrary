@@ -64,6 +64,11 @@ public class BagIt
 
     private static final int BUFFER = 8192;
 
+    /**
+     * Inner class to provide a reference to a file in the Bag.  Since the file in the bag
+     * may have different types, different sources for its input stream, and different tag
+     * properties, this allows us to provide a consistent wrapper for internal use.
+     */
     class BagFileReference
     {
         public ZipEntry zipEntry = null;
@@ -75,6 +80,12 @@ public class BagIt
         public int sequence = -1;
         public String format = null;
 
+        /**
+         * Get an input stream for this file reference
+         *
+         * @return  an implementation of InputStream which reads from the relevant source
+         * @throws IOException
+         */
         public InputStream getInputStream()
                 throws IOException
         {
@@ -93,6 +104,11 @@ public class BagIt
             return null;
         }
 
+        /**
+         * Get the filename for this reference
+         *
+         * @return  the name of the file, or null if none can be determined
+         */
         public String getFilename()
         {
             if (this.zipEntry != null)
@@ -145,6 +161,13 @@ public class BagIt
         }
     }
 
+    /**
+     * Construct the internal state of this BagIt object from the given file.  The file should be a zip file
+     * which conforms to the StudentWeb/Duo bag profile.
+     *
+     * @param file  The zip file which contains the bag
+     * @throws IOException
+     */
     public void loadBag(File file)
             throws IOException
     {
@@ -306,6 +329,13 @@ public class BagIt
         this.fileRefs.add(bfr);
     }
 
+    /**
+     * Get the current highest sequence number for the final files.
+     *
+     * Useful if you want to add a new file to the end of the sequence
+     *
+     * @return  an integer which is the same as the highest sequence number in the list of final files.  Note that the file sequence numbers are not guaranteed to be sequential.
+     */
     private int getFinalSequenceMax()
     {
         int maxSeq = 0;
@@ -385,6 +415,13 @@ public class BagIt
         this.fileRefs.add(bfr);
     }
 
+    /**
+     * Get the current highest sequence number for the supporting files.
+     *
+     * Useful if you want to add a new file to the end of the sequence
+     *
+     * @return  an integer which is the same as the highest sequence number in the list of supporting files.  Note that the file sequence numbers are not guaranteed to be sequential.
+     */
     private int getSupportingSequenceMax()
     {
         int maxSeq = 0;
@@ -458,6 +495,16 @@ public class BagIt
         this.fileRefs.add(bfr);
     }
 
+    /**
+     * Write the metadata object to the given path inside the given zip file output stream
+     *
+     * @param metadata  A BagIt Metadata object
+     * @param path  The path within the zip file to store the resulting metadata file
+     * @param out   The ZipOutputStream to write the file to
+     * @return  The MD5 digest of the resulting metadata file
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     private String writeToZip(Metadata metadata, String path, ZipOutputStream out)
             throws IOException, NoSuchAlgorithmException
     {
@@ -466,6 +513,17 @@ public class BagIt
         return this.writeToZip(bais, path, out);
     }
 
+    /**
+     * Write the file referenced by the file handle to the given path inside the given zip output stream
+     *
+     * @param file  The file reference
+     * @param path  The path within the zip file to store a copy of the file
+     * @param out   The ZipOutputStream to write the file to
+     * @return  The MD5 digest of the file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     private String writeToZip(File file, String path, ZipOutputStream out)
             throws FileNotFoundException, IOException, NoSuchAlgorithmException
     {
@@ -473,6 +531,17 @@ public class BagIt
         return this.writeToZip(fi, path, out);
     }
 
+    /**
+     * Write a text file containing the supplied string to the given path inside the given zip output stream
+     *
+     * @param str   The string to write into a file
+     * @param path  The path within the zip file to store the resulting text file
+     * @param out   The ZipOutputStream to write the file to
+     * @return  The MD5 digest of the resulting text file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     private String writeToZip(String str, String path, ZipOutputStream out)
             throws FileNotFoundException, IOException, NoSuchAlgorithmException
     {
@@ -480,6 +549,15 @@ public class BagIt
         return this.writeToZip(bais, path, out);
     }
 
+    /**
+     * Write the data from the input stream to the given path inside the given zip output stream
+     * @param fi    InputStream to source data from
+     * @param path  The path within the zip file to store the resulting file
+     * @param out   The ZipOutputStream to write the file to
+     * @return  The MD5 digest of the resulting text file
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
     private String writeToZip(InputStream fi, String path, ZipOutputStream out)
             throws IOException, NoSuchAlgorithmException
     {
