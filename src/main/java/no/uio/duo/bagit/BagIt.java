@@ -236,6 +236,11 @@ public class BagIt
 
             java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
             String content = s.hasNext() ? s.next() : "";
+            if ("".equals(content.trim()))
+            {
+                // this tag file is empty, so carry on
+                continue;
+            }
 
             String[] lines = content.split("\n");
             for (String line : lines)
@@ -664,20 +669,39 @@ public class BagIt
                 }
             }
 
-            String checksum = this.writeToZip(formats, this.baseDir + "tagfiles/formats.txt", out);
-            tagmanifest = tagmanifest + checksum + "\ttagfiles/formats.txt" + "\n";
+            if (!"".equals(formats))
+            {
+                String checksum = this.writeToZip(formats, this.baseDir + "tagfiles/formats.txt", out);
+                tagmanifest = tagmanifest + checksum + "\ttagfiles/formats.txt" + "\n";
+            }
 
-            checksum = this.writeToZip(finalSequence, this.baseDir + "tagfiles/final.sequence.txt", out);
-            tagmanifest = tagmanifest + checksum + "\ttagfiles/final.sequence.txt" + "\n";
+            if (!"".equals(finalSequence))
+            {
+                String checksum = this.writeToZip(finalSequence, this.baseDir + "tagfiles/final.sequence.txt", out);
+                tagmanifest = tagmanifest + checksum + "\ttagfiles/final.sequence.txt" + "\n";
+            }
 
-            checksum = this.writeToZip(supportingSequence, this.baseDir + "tagfiles/supporting.sequence.txt", out);
-            tagmanifest = tagmanifest + checksum + "\ttagfiles/supporting.sequence.txt" + "\n";
+            if (!"".equals(supportingSequence))
+            {
+                String checksum = this.writeToZip(supportingSequence, this.baseDir + "tagfiles/supporting.sequence.txt", out);
+                tagmanifest = tagmanifest + checksum + "\ttagfiles/supporting.sequence.txt" + "\n";
+            }
 
-            checksum = this.writeToZip(supportingAccess, this.baseDir + "tagfiles/supporting.access.txt", out);
-            tagmanifest = tagmanifest + checksum + "\ttagfiles/supporting.access.txt" + "\n";
+            if (!"".equals(supportingAccess))
+            {
+                String checksum = this.writeToZip(supportingAccess, this.baseDir + "tagfiles/supporting.access.txt", out);
+                tagmanifest = tagmanifest + checksum + "\ttagfiles/supporting.access.txt" + "\n";
+            }
 
-            this.writeToZip(manifest, this.baseDir + "manifest-md5.txt", out);
-            this.writeToZip(tagmanifest, this.baseDir + "tagmanifest-md5.txt", out);
+            if (!"".equals(manifest))
+            {
+                this.writeToZip(manifest, this.baseDir + "manifest-md5.txt", out);
+            }
+
+            if (!"".equals(tagmanifest))
+            {
+                this.writeToZip(tagmanifest, this.baseDir + "tagmanifest-md5.txt", out);
+            }
 
             String bagitfile = "BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8";
             this.writeToZip(bagitfile, this.baseDir + "bagit.txt", out);

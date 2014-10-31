@@ -3,6 +3,7 @@ package no.uio.duo.bagit;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.TreeMap;
 
 
 public class ScratchPad
@@ -162,6 +163,35 @@ public class ScratchPad
         BagIt biin = new BagIt(new File(out));
 
         BaggedItem baggedItem = biin.getMetadataFile();
+    }
+
+    @Test
+    public void writeThenReadEmpty() throws Exception
+    {
+        String fileBase = System.getProperty("user.dir") + "/src/test/resources/testbags/testfiles/";
+        String out = System.getProperty("user.dir") + "/src/test/resources/testbags/emptybag.zip";
+
+        BagIt bi = new BagIt(new File(out));
+        bi.writeToFile();
+
+        // now read the bagit in
+        BagIt biin = new BagIt(new File(out));
+
+
+
+        TreeMap<Integer, BaggedItem> sf = biin.getSequencedFinals();
+        assert sf.size() == 0;
+
+        TreeMap<Integer, BaggedItem> sso = biin.getSequencedSecondaries("open");
+        assert sso.size() == 0;
+
+        TreeMap<Integer, BaggedItem> ssc = biin.getSequencedSecondaries("closed");
+        assert ssc.size() == 0;
+
+        assert biin.getMetadataFile() == null;
+        assert biin.getLicenceFile() == null;
+
+        assert biin.getSupportingAccess("whatever") == null;
     }
 
     @Test
