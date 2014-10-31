@@ -241,6 +241,10 @@ public class BagIt
             for (String line : lines)
             {
                 String[] bits = line.split("\t");
+                if (bits.length < 2)
+                {
+                    throw new IOException("Malformed tag file: " + entry.getName() + " - " + content + "; unable to separate line: " + line);
+                }
                 entryMap.put(bits[1], bits[0]);
             }
 
