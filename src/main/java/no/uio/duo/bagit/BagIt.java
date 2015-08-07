@@ -836,7 +836,7 @@ public class BagIt
         {
             for (BagFileReference bfr : this.fileRefs)
             {
-                if (BagIt.METADATA.equals(bfr.type))
+                if (BagIt.LICENCE.equals(bfr.type))
                 {
                     BaggedItem licence = new BaggedItem();
                     licence.setInputStream(bfr.getInputStream());
